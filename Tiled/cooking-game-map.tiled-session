@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "map.tmx",
+    "activeFile": "Tiled Maps/kitchen.tsx",
     "expandedProjectPaths": [
         "."
     ],
@@ -26,7 +26,26 @@
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "Tiled Maps/Tiles.tsx": {
+            "scaleInDock": 1
+        },
+        "Tiled Maps/Tileset_32x32_1.tsx": {
+            "scaleInDock": 1
+        },
+        "Tiled Maps/kitchen.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Tiled Maps/map.tmx": {
+            "scale": 0.455703125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 481.6732384707698,
+                "y": 319.28681638950803
+            }
+        },
         "Tiles.tsx": {
+            "dynamicWrapping": false,
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
@@ -42,10 +61,10 @@
         },
         "map.tmx": {
             "scale": 0.5,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 509,
-                "y": 179
+                "x": 431,
+                "y": 469
             }
         }
     },
@@ -53,16 +72,17 @@
     "last.imagePath": "/home/kev/Downloads/Spritesheets(1)/Spritesheets",
     "map.lastUsedFormat": "tmx",
     "openFiles": [
-        "map.tmx",
-        "kitchen.tsx",
-        "Tiles.tsx"
+        "Tiled Maps/map.tmx",
+        "Tiled Maps/kitchen.tsx"
     ],
     "project": "cooking-game-map.tiled-project",
     "recentFiles": [
+        "Tiled Maps/map.tmx",
+        "Tiled Maps/kitchen.tsx",
+        "map.tmx",
         "Door.tsx",
         "Tiles.tsx",
         "kitchen.tsx",
-        "map.tmx",
         "Interiors_free_32x32.tsx",
         "!$DOOR_2HIGH5.tsx",
         "Room_Builder_free_32x32.tsx",
