@@ -1,5 +1,5 @@
 {
-    "activeFile": "Tileset_32x32_1.tsx",
+    "activeFile": "/home/kev/Documents/ENG1-Assessment-One/JavaDev/assets/Tiled/map.tmx",
     "expandedProjectPaths": [
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
@@ -9,7 +9,23 @@
             "scaleInEditor": 1
         },
         "/home/kev/Documents/ENG1-Assessment-One/JavaDev/assets/Tiled/Tiles.tsx": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
+        },
+        "/home/kev/Documents/ENG1-Assessment-One/JavaDev/assets/Tiled/Tileset_32x32_1.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/kev/Documents/ENG1-Assessment-One/JavaDev/assets/Tiled/kitchen.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/kev/Documents/ENG1-Assessment-One/JavaDev/assets/Tiled/map.tmx": {
+            "scale": 0.125,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 756,
+                "y": 1040
+            }
         },
         "Door.tsx": {
             "dynamicWrapping": false,
@@ -68,12 +84,13 @@
     },
     "last.imagePath": "/home/kev/Documents/ENG1-Assessment-One/JavaDev/assets/Tiled",
     "openFiles": [
-        "map.tmx",
-        "Tiles.tsx",
-        "Tileset_32x32_1.tsx"
+        "/home/kev/Documents/ENG1-Assessment-One/JavaDev/assets/Tiled/map.tmx",
+        "/home/kev/Documents/ENG1-Assessment-One/JavaDev/assets/Tiled/Tileset_32x32_1.tsx"
     ],
     "project": "",
     "recentFiles": [
+        "/home/kev/Documents/ENG1-Assessment-One/JavaDev/assets/Tiled/Tileset_32x32_1.tsx",
+        "/home/kev/Documents/ENG1-Assessment-One/JavaDev/assets/Tiled/map.tmx",
         "/home/kev/Documents/ENG1-Assessment-One/JavaDev/assets/Tiled/Tiles.tsx",
         "map.tmx",
         "Tiles.tsx",
@@ -83,7 +100,6 @@
         "Door.tsx",
         "kitchen.tsx",
         "Interiors_free_32x32.tsx",
-        "!$DOOR_2HIGH5.tsx",
-        "Room_Builder_free_32x32.tsx"
+        "!$DOOR_2HIGH5.tsx"
     ]
 }
