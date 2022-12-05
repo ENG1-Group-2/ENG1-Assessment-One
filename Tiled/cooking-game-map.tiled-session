@@ -1,16 +1,14 @@
 {
-    "Map/SizeTest": {
-        "height": 4300,
-        "width": 2
-    },
-    "activeFile": "Tiled Maps/kitchen.tsx",
+    "activeFile": "Tileset_32x32_1.tsx",
     "expandedProjectPaths": [
-        "."
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "!$DOOR_2HIGH5.tsx": {
             "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/kev/Documents/ENG1-Assessment-One/JavaDev/assets/Tiled/Tiles.tsx": {
             "scaleInEditor": 1
         },
         "Door.tsx": {
@@ -63,31 +61,29 @@
             "scale": 0.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 431,
-                "y": 469
+                "x": -30857,
+                "y": -9782
             }
         }
     },
-    "last.externalTilesetPath": "/home/kev/Documents/ENG1-Assessment-One",
-    "last.imagePath": "/home/kev/Downloads/Spritesheets(1)/Spritesheets",
-    "map.lastUsedFormat": "tmx",
+    "last.imagePath": "/home/kev/Documents/ENG1-Assessment-One/JavaDev/assets/Tiled",
     "openFiles": [
-        "Tiled Maps/map.tmx",
-        "Tiled Maps/kitchen.tsx"
+        "map.tmx",
+        "Tiles.tsx",
+        "Tileset_32x32_1.tsx"
     ],
-    "project": "cooking-game-map.tiled-project",
+    "project": "",
     "recentFiles": [
+        "/home/kev/Documents/ENG1-Assessment-One/JavaDev/assets/Tiled/Tiles.tsx",
+        "map.tmx",
+        "Tiles.tsx",
+        "Tileset_32x32_1.tsx",
         "Tiled Maps/map.tmx",
         "Tiled Maps/kitchen.tsx",
-        "map.tmx",
         "Door.tsx",
-        "Tiles.tsx",
         "kitchen.tsx",
         "Interiors_free_32x32.tsx",
         "!$DOOR_2HIGH5.tsx",
-        "Room_Builder_free_32x32.tsx",
-        "Tileset_32x32_1.tsx"
-    ],
-    "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)",
-    "tileset.lastUsedFormat": "tsx"
+        "Room_Builder_free_32x32.tsx"
+    ]
 }
