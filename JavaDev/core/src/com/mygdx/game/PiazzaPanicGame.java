@@ -22,7 +22,7 @@ public class PiazzaPanicGame extends ApplicationAdapter implements InputProcesso
 	TiledMapRenderer tiledMapRenderer;
 	Rectangle chefOne;
 	Texture chefImage;
-	private SpriteBatch batch;
+	SpriteBatch batch;
 	Rectangle lastClick;
 	Boolean lastClickObject = false;
 
@@ -74,9 +74,9 @@ public class PiazzaPanicGame extends ApplicationAdapter implements InputProcesso
 	public void clickEvent (int x, int y){
 		if (Gdx.input.isTouched()) {
 			if (lastClickObject) {
-				onClickObject(Gdx.input.getX(), Gdx.input.getY());
-			} else {
 				onClickMove(Gdx.input.getX(), Gdx.input.getY());
+			} else {
+				onClickObject(Gdx.input.getX(), Gdx.input.getY());
 			}
 		}
 	}
@@ -93,8 +93,8 @@ public class PiazzaPanicGame extends ApplicationAdapter implements InputProcesso
 	}
 
 	private void onClickMove(int x, int y){
-		//Raindrops need to be rendered.
-		System.out.println("IN");
+		lastClick.x = x;
+		lastClick.y = Gdx.graphics.getHeight() - y;
 		lastClickObject = false;
 	}
 
