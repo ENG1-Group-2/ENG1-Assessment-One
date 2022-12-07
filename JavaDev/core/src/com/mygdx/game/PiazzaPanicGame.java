@@ -21,6 +21,7 @@ public class PiazzaPanicGame extends ApplicationAdapter implements InputProcesso
 	OrthographicCamera camera;
 	TiledMapRenderer tiledMapRenderer;
 	Rectangle chefOne;
+	Rectangle chefTwo;
 	Texture chefImage;
 	SpriteBatch batch;
 	Rectangle lastClick;
@@ -56,6 +57,13 @@ public class PiazzaPanicGame extends ApplicationAdapter implements InputProcesso
 		chefOne.width = 64;
 		chefOne.height = 64;
 
+		//Position chef at staff room door.
+		chefTwo = new Rectangle();
+		chefTwo.x = 600;
+		chefTwo.y = 400;
+		chefTwo.width = 64;
+		chefTwo.height = 64;
+
 		Gdx.input.setInputProcessor(this);
 	}
 
@@ -68,6 +76,7 @@ public class PiazzaPanicGame extends ApplicationAdapter implements InputProcesso
 		//Raindrops need to be rendered.
 		batch.begin();
 		batch.draw(chefImage, chefOne.x, chefOne.y);
+		batch.draw(chefImage, chefTwo.x, chefTwo.y);
 		batch.end();
 	}
 
@@ -84,6 +93,7 @@ public class PiazzaPanicGame extends ApplicationAdapter implements InputProcesso
 	private void onClickObject(int x, int y) {
 		ArrayList<Rectangle> sprites = new ArrayList<>();
 		sprites.add(chefOne);
+		sprites.add(chefTwo);
 		for (Rectangle sprite: sprites){
 			if (checkClickOnSprite(sprite, x, y)){
 				lastClick = sprite;
