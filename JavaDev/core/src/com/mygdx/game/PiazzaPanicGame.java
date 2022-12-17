@@ -102,7 +102,7 @@ public class PiazzaPanicGame extends ApplicationAdapter implements InputProcesso
 		batch.draw(chefImage, chefTwo.x, chefTwo.y);
 		batch.end();
 
-		//movementsss
+		//movementsssw
 		if(Gdx.input.isKeyPressed(Keys.LEFT)) chefOne.x -= 400 * Gdx.graphics.getDeltaTime();
 		if(Gdx.input.isKeyPressed(Keys.RIGHT)) chefOne.x += 400 * Gdx.graphics.getDeltaTime();
 		if(Gdx.input.isKeyPressed(Keys.UP)) chefOne.y += 400 * Gdx.graphics.getDeltaTime();
