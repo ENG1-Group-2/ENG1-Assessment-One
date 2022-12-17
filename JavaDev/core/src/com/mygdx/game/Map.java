@@ -6,7 +6,10 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.MapProperties;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -34,6 +37,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	//Keep track of whether a relevant object was clicked previously.
 	Boolean lastClickObject;
 	ArrayList<Rectangle> sprites = new ArrayList<>();
+	MapObjects objects;
 
 	private PiazzaPanicGame piazzaPanicGame;
 
@@ -49,7 +53,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 	@Override
 	public void show(){
-		chefImage = new Texture(Gdx.files.internal("chef.png"));
+		chefImage = new Texture(Gdx.files.internal("chef3.png"));
 		tiledMap = new TmxMapLoader().load("Tiled/map.tmx");
 
 		//Gets all properties from imported tiled map.
@@ -89,6 +93,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		// Keep list of sprites to make checking clicks easier.
 		sprites.add(chefOne);
 		sprites.add(chefTwo);
+
+		objects = tiledMap.getLayers().get(0).getObjects();
 
 		Gdx.input.setInputProcessor(this);
 	}
@@ -135,7 +141,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	private void onClickObject(int x, int y) {
 		for (Rectangle sprite: sprites){
-			if (checkClickOnSprite(sprite, x, y)){
+			if (rectangleDetection(sprite, x, y)){
 				lastClick = sprite;
 				lastClickObject = true;
 			}
@@ -164,10 +170,14 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 * @param y Y position of the area that has been clicked.
 	 * @return [Boolean] Whether the user has clicked on the sprite or not.
 	 */
-	private boolean checkClickOnSprite(Rectangle sprite, int x, int y){
+	private boolean rectangleDetection(Rectangle sprite, int x, int y){
 		// Y is inverted in LibGDX.
 		return x > sprite.getX() && x < sprite.getX() + sprite.getWidth()
 				&& Gdx.graphics.getHeight() - y > sprite.getY() && Gdx.graphics.getHeight() - y < sprite.getHeight() + sprite.getY();
+	}
+
+	private boolean rectangleDetection(Rectangle sprite, float x, float y){
+		return sprite.contains(x, Gdx.graphics.getHeight() - y);
 	}
 
 	/**
@@ -181,10 +191,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	@Override
 	public boolean keyDown(int keycode) {
 		if (lastClickObject != true){
-			charactorMovement();
+			charactorMovement(keycode);
 			return true;
 		}
-		else{
+		else {
 			return false;
 		}
 	}
@@ -199,7 +209,24 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		}
 	}
 
-	private void charactorMovement() {
+	private void charactorMovement(int keycode) {
+		MapObject ingredientStation = objects.get("Pantry access");
+		RectangleMapObject ingredientStationObject = (RectangleMapObject) ingredientStation;
+		if (rectangleDetection(ingredientStationObject.getRectangle(), lastClick.x, lastClick.y)) {
+			System.out.println(objects.get("Pantry access").getName());
+		}
+		if (keycode == 51){
+			lastClick.y += 400 * Gdx.graphics.getDeltaTime();
+		}
+		else if (keycode == 29){
+			lastClick.x -= 400 * Gdx.graphics.getDeltaTime();
+		}
+		else if (keycode == 47){
+			lastClick.y -= 400 * Gdx.graphics.getDeltaTime();
+		}
+		else if (keycode == 32){
+			lastClick.x += 400 * Gdx.graphics.getDeltaTime();
+		}
 	}
 
 	@Override
