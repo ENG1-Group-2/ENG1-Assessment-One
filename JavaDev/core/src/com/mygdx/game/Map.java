@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.MapProperties;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
  * Inputs are detected by implementing InputProcessor which explains empty functions.
  * Auto launches this screen in the current prototype.
  */
-public class PiazzaPanicGame extends ApplicationAdapter implements InputProcessor{
+public class Map extends ScreenAdapter implements InputProcessor{
 	TiledMap tiledMap;
 	OrthographicCamera camera;
 	TiledMapRenderer tiledMapRenderer;
@@ -34,13 +35,20 @@ public class PiazzaPanicGame extends ApplicationAdapter implements InputProcesso
 	Boolean lastClickObject;
 	ArrayList<Rectangle> sprites = new ArrayList<>();
 
+	private PiazzaPanicGame piazzaPanicGame;
+
+	public Map(PiazzaPanicGame piazzaPanicGame) {
+		piazzaPanicGame = piazzaPanicGame;
+	}
+
 	/**
 	 * Loads the map and sprites.
 	 * Get the properties for the map.
 	 * Creates the camera and sets the initial position of the chefs.
 	 */
+
 	@Override
-	public void create (){
+	public void show(){
 		chefImage = new Texture(Gdx.files.internal("chef.png"));
 		tiledMap = new TmxMapLoader().load("Tiled/map.tmx");
 
@@ -90,7 +98,7 @@ public class PiazzaPanicGame extends ApplicationAdapter implements InputProcesso
 	 * by rendering camera and sprites.
 	 */
 	@Override
-	public void render () {
+	public void render(float delta) {
 		camera.update();
 		tiledMapRenderer.setView(camera);
 		tiledMapRenderer.render();
@@ -172,12 +180,26 @@ public class PiazzaPanicGame extends ApplicationAdapter implements InputProcesso
 
 	@Override
 	public boolean keyDown(int keycode) {
-		return false;
+		if (lastClickObject != true){
+			charactorMovement();
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 
 	@Override
 	public boolean keyUp(int keycode) {
-		return false;
+		if (lastClickObject != true){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+
+	private void charactorMovement() {
 	}
 
 	@Override

@@ -1,8 +1,8 @@
 package com.mygdx.game;
 
-public class SingleStateIngredient extends Ingredient{
+public class PreChoppedIngredient extends Ingredient{
 
-    public SingleStateIngredient(String name) {
+    public PreChoppedIngredient(String name) {
         super(name, true);
     }
 }
