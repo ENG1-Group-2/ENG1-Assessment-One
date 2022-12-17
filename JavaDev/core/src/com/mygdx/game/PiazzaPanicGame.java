@@ -12,6 +12,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.Input.Keys;
 
 import java.util.ArrayList;
 
@@ -41,7 +42,7 @@ public class PiazzaPanicGame extends ApplicationAdapter implements InputProcesso
 	 */
 	@Override
 	public void create (){
-		chefImage = new Texture(Gdx.files.internal("chef.png"));
+		chefImage = new Texture(Gdx.files.internal("chef3.png"));
 		tiledMap = new TmxMapLoader().load("Tiled/map.tmx");
 
 		//Gets all properties from imported tiled map.
@@ -100,7 +101,14 @@ public class PiazzaPanicGame extends ApplicationAdapter implements InputProcesso
 		batch.draw(chefImage, chefOne.x, chefOne.y);
 		batch.draw(chefImage, chefTwo.x, chefTwo.y);
 		batch.end();
+
+
+		if(Gdx.input.isKeyPressed(Keys.LEFT)) chefOne.x -= 400 * Gdx.graphics.getDeltaTime();
+		if(Gdx.input.isKeyPressed(Keys.RIGHT)) chefOne.x += 400 * Gdx.graphics.getDeltaTime();
+		if(Gdx.input.isKeyPressed(Keys.UP)) chefOne.y += 400 * Gdx.graphics.getDeltaTime();
+		if(Gdx.input.isKeyPressed(Keys.DOWN)) chefOne.y -= 400 * Gdx.graphics.getDeltaTime();
 	}
+
 
 	/**
 	 * Decided what to do with the click input that has been occured
@@ -142,8 +150,8 @@ public class PiazzaPanicGame extends ApplicationAdapter implements InputProcesso
 	 * @param y Y position of the area that has been clicked.
 	 */
 	private void onClickMove(int x, int y){
-		lastClick.x = x;
-		lastClick.y = Gdx.graphics.getHeight() - y;
+		lastClick.x = x - 20;
+		lastClick.y = Gdx.graphics.getHeight() - y - 20;
 		lastClickObject = false;
 	}
 
@@ -156,7 +164,7 @@ public class PiazzaPanicGame extends ApplicationAdapter implements InputProcesso
 	 * @param y Y position of the area that has been clicked.
 	 * @return [Boolean] Whether the user has clicked on the sprite or not.
 	 */
-	private boolean checkClickOnSprite(Rectangle sprite, int x, int y){
+	private boolean checkClickOnSprite(Rectangle sprite, float x, float y){
 		// Y is inverted in LibGDX.
 		return x > sprite.getX() && x < sprite.getX() + sprite.getWidth()
 				&& Gdx.graphics.getHeight() - y > sprite.getY() && Gdx.graphics.getHeight() - y < sprite.getHeight() + sprite.getY();
