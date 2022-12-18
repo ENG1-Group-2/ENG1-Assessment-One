@@ -334,6 +334,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		// TODO: Get pantry detection working.
 		// area.getY() - area.getHeight() < sprite.getY()
 		// area.getX() - area.getWidth() > sprite.getX()
+		return false;
 	}
 
 
