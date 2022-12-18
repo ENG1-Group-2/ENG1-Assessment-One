@@ -15,11 +15,8 @@ import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
-import com.sun.tools.javac.api.WrappingJavaFileManager;
 
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.Random;
 
 /**
@@ -37,6 +34,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	Rectangle customerTwo;
 	Texture chefImage;
 	Texture customerOneImage;
+	Texture customerTwoImage;
 	SpriteBatch batch;
 	//Keep track on what object was clicked last to help with movement.
 	Rectangle lastClick;
@@ -49,6 +47,26 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	boolean drawCustomerOne;
 	boolean drawCustomerTwo;
 	long lastRender;
+	Ingredient onion;
+	Ingredient pepper;
+	Ingredient lettuce;
+	Ingredient cookedChicken;
+	Ingredient saladDressing;
+	Ingredient pineapple;
+	Ingredient pizzaSauce;
+	Ingredient pizzaBase;
+	Ingredient burgerPatty;
+	Ingredient tuna;
+	Ingredient mayo;
+	Ingredient jacketPotato;
+	Ingredient breadBuns;
+	Ingredient ham;
+	Recipe hamAndPineapplePizza;
+	Recipe chickenSalad;
+	Recipe tunaJacketPotato;
+	Recipe beefBurger;
+	ArrayList<Recipe> recipes;
+
 	private PiazzaPanicGame piazzaPanicGame;
 
 	public Map(PiazzaPanicGame piazzaPanicGame) {
@@ -66,6 +84,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		chefImage = new Texture(Gdx.files.internal("chef.png"));
 		tiledMap = new TmxMapLoader().load("Tiled/map.tmx");
 		customerOneImage = new Texture(Gdx.files.internal("person001.png"));
+		customerTwoImage = new Texture(Gdx.files.internal("person002.png"));
 
 		//Gets all properties from imported tiled map.
 		MapProperties properties = tiledMap.getProperties();
@@ -121,6 +140,42 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		resetCustomerTwo();
 		drawCustomerOne = false;
 		drawCustomerTwo = false;
+
+		createPantryItem();
+		createRecipes();
+	}
+
+	private void createRecipes() {
+		recipes = new ArrayList<>(4);
+
+		hamAndPineapplePizza = new Recipe("Ham and Pineapple Pizza", 3);
+		recipes.add(hamAndPineapplePizza);
+
+		tunaJacketPotato = new Recipe("Tuna Jacket Potato", 2);
+		recipes.add(tunaJacketPotato);
+
+		beefBurger = new Recipe("Beef Burger", 2);
+		recipes.add(beefBurger);
+
+		chickenSalad = new Recipe("Chicken Salad", 2);
+		recipes.add(chickenSalad);
+	}
+
+	private void createPantryItem() {
+		onion = new Ingredient("Onion", false);
+		pepper = new Ingredient("Peppers", false);
+		lettuce = new Ingredient("Lettuce", false);
+		cookedChicken = new PreChoppedIngredient("Chicken");
+		saladDressing = new PreChoppedIngredient("Salad Dressing");
+		pineapple = new Ingredient("Pineapple", false);
+		pizzaSauce = new PreChoppedIngredient("Pizza Sauce");
+		pizzaBase = new HotIngredient("Base", true, 5);
+		burgerPatty = new HotIngredient("BurgerPatty", true, 5);
+		mayo = new PreChoppedIngredient("Mayo");
+		tuna = new PreChoppedIngredient("Tuna");
+		jacketPotato = new HotIngredient("JacketPotato", false, 5);
+		breadBuns = new HotIngredient("BreadBuns", false, 5);
+		ham = new PreChoppedIngredient("Ham");
 	}
 
 	private void resetCustomerOne(){
@@ -132,11 +187,11 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	}
 
 	private void resetCustomerTwo(){
-		customerOne = new Rectangle();
-		customerOne.x = 600;
-		customerOne.y = 25;
-		customerOne.width = 100;
-		customerOne.height = 100;
+		customerTwo = new Rectangle();
+		customerTwo.x = 600;
+		customerTwo.y = 25;
+		customerTwo.width = 100;
+		customerTwo.height = 100;
 	}
 
 	/**
@@ -154,27 +209,49 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		batch.draw(chefImage, chefOne.x, chefOne.y);
 		batch.draw(chefImage, chefTwo.x, chefTwo.y);
 
-		if (System.currentTimeMillis() - lastRender > 1000) {
+		if (System.currentTimeMillis() - lastRender > 20000) {
 			Random random = new Random();
 			if (random.nextBoolean()){
 				drawCustomerOne = true;
-				System.out.println("PRINTED");
+				randomOrderGeneration();
+			}
+			else {
+				System.out.println("C2");
+				drawCustomerTwo = true;
 			}
 			lastRender = System.currentTimeMillis();
 		}
 
 		if (drawCustomerOne){
 			if (customerOne.x > 240){
-				// TODO: Choose an order
+				randomOrderGeneration();
 				drawCustomerOne = false;
 				resetCustomerOne();
+
 			}
 			customerOne.x += 50 * Gdx.graphics.getDeltaTime();
 			batch.draw(customerOneImage, customerOne.x, customerOne.y);
 
 		}
 
+		if (drawCustomerTwo){
+			if (customerTwo.x < 340){
+				randomOrderGeneration();
+				drawCustomerTwo = false;
+				resetCustomerTwo();
+			}
+			customerTwo.x -= 50 * Gdx.graphics.getDeltaTime();
+			batch.draw(customerTwoImage, customerTwo.x, customerTwo.y);
+		}
+
 		batch.end();
+	}
+
+	private void randomOrderGeneration() {
+		customerCounter -= 1;
+		Random random = new Random();
+		int index = random.nextInt(recipes.size());
+		System.out.println(recipes.get(index).getName());
 	}
 
 	/**
@@ -257,12 +334,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 	@Override
 	public boolean keyUp(int keycode) {
-		if (lastClickObject != true){
-			return true;
-		}
-		else{
-			return false;
-		}
+		return false;
 	}
 
 	private void charactorMovement(int keycode) {
