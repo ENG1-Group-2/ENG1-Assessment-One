@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="21">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="49">
  <tileset firstgid="1" source="kitchen.tsx"/>
  <tileset firstgid="57" source="Tileset_32x32_1.tsx"/>
  <tileset firstgid="157" source="Tiles.tsx"/>
  <objectgroup id="6" name="Starting Point">
-  <object id="19" name="PantryAccess" class="PantryAccess" x="598.467" y="166.786" width="166.785" height="158.61"/>
+  <object id="42" name="PantryAccess" x="618" y="224" width="99" height="94"/>
  </objectgroup>
  <layer id="1" name="Base Map" width="30" height="20">
   <data encoding="csv">

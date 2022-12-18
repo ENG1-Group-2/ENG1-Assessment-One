@@ -213,10 +213,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			Random random = new Random();
 			if (random.nextBoolean()){
 				drawCustomerOne = true;
-				randomOrderGeneration();
 			}
 			else {
-				System.out.println("C2");
 				drawCustomerTwo = true;
 			}
 			lastRender = System.currentTimeMillis();
@@ -224,8 +222,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 		if (drawCustomerOne){
 			if (customerOne.x > 240){
-				randomOrderGeneration();
 				drawCustomerOne = false;
+				randomOrderGeneration();
 				resetCustomerOne();
 
 			}
@@ -236,9 +234,9 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 		if (drawCustomerTwo){
 			if (customerTwo.x < 340){
-				randomOrderGeneration();
 				drawCustomerTwo = false;
 				resetCustomerTwo();
+				randomOrderGeneration();
 			}
 			customerTwo.x -= 50 * Gdx.graphics.getDeltaTime();
 			batch.draw(customerTwoImage, customerTwo.x, customerTwo.y);
@@ -314,6 +312,18 @@ public class Map extends ScreenAdapter implements InputProcessor{
 				&& Gdx.graphics.getHeight() - y > sprite.getY() && Gdx.graphics.getHeight() - y < sprite.getHeight() + sprite.getY();
 	}
 
+	private boolean rectangleDetection(Rectangle sprite, float x, float y){
+		// Y is inverted in LibGDX.
+		return x > sprite.getX() && x < sprite.getX() + sprite.getWidth()
+				&& Gdx.graphics.getHeight() - y > sprite.getY() && Gdx.graphics.getHeight() - y < sprite.getHeight() + sprite.getY();
+	}
+
+	private boolean enterAreaCheck(Rectangle area, Rectangle sprite){
+		// TODO
+		return area.getX() - area.getWidth() > sprite.getX() && area.getY() - area.getHeight() < sprite.getY();
+	}
+
+
 	/**
 	 * Disposes all assets for cleaner exit.
 	 */
@@ -338,6 +348,12 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	}
 
 	private void charactorMovement(int keycode) {
+		if (enterAreaCheck(ingredientsStation, lastClick)){
+			System.out.println("X WORKING");
+		}
+		else{
+			System.out.println("X NOT DETECTED");
+		}
 		if (keycode == 51){
 			lastClick.y += 400 * Gdx.graphics.getDeltaTime();
 		}
