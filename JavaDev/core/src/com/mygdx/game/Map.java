@@ -124,6 +124,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		sprites.add(chefOne);
 		sprites.add(chefTwo);
 
+		// Get properties for ingredients stations rectangle stored in the tiled map.
 		objects = tiledMap.getLayers().get(0).getObjects();
 		MapObject pantryAccess = objects.get("PantryAccess");
 		if (pantryAccess instanceof RectangleMapObject) {
@@ -134,18 +135,22 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 		Gdx.input.setInputProcessor(this);
 
+		// Last time a customer has appeared.
 		lastRender = System.currentTimeMillis();
 
+		// Reset the customer to the base location.
 		resetCustomerOne();
 		resetCustomerTwo();
 		drawCustomerOne = false;
 		drawCustomerTwo = false;
 
+		// Creating pantry and recipes using class defined in package.
 		createPantryItem();
 		createRecipes();
 	}
 
 	private void createRecipes() {
+		// Store all recipes in an array list to randomly choose an index.
 		recipes = new ArrayList<>(4);
 
 		hamAndPineapplePizza = new Recipe("Ham and Pineapple Pizza", 3);
@@ -209,8 +214,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		batch.draw(chefImage, chefOne.x, chefOne.y);
 		batch.draw(chefImage, chefTwo.x, chefTwo.y);
 
+		//If it has been 20 seconds since a customer appeared.
 		if (System.currentTimeMillis() - lastRender > 20000) {
 			Random random = new Random();
+			// Randomly choose between customer one or two.
 			if (random.nextBoolean()){
 				drawCustomerOne = true;
 			}
@@ -220,7 +227,9 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			lastRender = System.currentTimeMillis();
 		}
 
+		// Keep on moving customers along per frame.
 		if (drawCustomerOne){
+			// If it at the position it needs to be in.
 			if (customerOne.x > 240){
 				drawCustomerOne = false;
 				randomOrderGeneration();
@@ -246,7 +255,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	}
 
 	private void randomOrderGeneration() {
+		// Keep track of how many customers have appeared.
 		customerCounter -= 1;
+
+		// TODO: Add this to some form of data structure - currently just prints out.
 		Random random = new Random();
 		int index = random.nextInt(recipes.size());
 		System.out.println(recipes.get(index).getName());
@@ -319,8 +331,9 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	}
 
 	private boolean enterAreaCheck(Rectangle area, Rectangle sprite){
-		// TODO
-		return area.getX() - area.getWidth() > sprite.getX() && area.getY() - area.getHeight() < sprite.getY();
+		// TODO: Get pantry detection working.
+		// area.getY() - area.getHeight() < sprite.getY()
+		// area.getX() - area.getWidth() > sprite.getX()
 	}
 
 
@@ -349,10 +362,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 	private void charactorMovement(int keycode) {
 		if (enterAreaCheck(ingredientsStation, lastClick)){
-			System.out.println("X WORKING");
-		}
-		else{
-			System.out.println("X NOT DETECTED");
+			// TODO: Change screen to ingredients screen.
 		}
 		if (keycode == 51){
 			lastClick.y += 400 * Gdx.graphics.getDeltaTime();
