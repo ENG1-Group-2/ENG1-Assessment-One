@@ -1,11 +1,11 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.MapProperties;
@@ -15,9 +15,12 @@ import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.sun.tools.javac.api.WrappingJavaFileManager;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.Random;
 
 /**
  * Main game screen which enables the user to control the map.
@@ -30,7 +33,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	TiledMapRenderer tiledMapRenderer;
 	Rectangle chefOne;
 	Rectangle chefTwo;
+	Rectangle customerOne;
+	Rectangle customerTwo;
 	Texture chefImage;
+	Texture customerOneImage;
 	SpriteBatch batch;
 	//Keep track on what object was clicked last to help with movement.
 	Rectangle lastClick;
@@ -38,7 +44,11 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	Boolean lastClickObject;
 	ArrayList<Rectangle> sprites = new ArrayList<>();
 	MapObjects objects;
-
+	Rectangle ingredientsStation;
+	int customerCounter = 5;
+	boolean drawCustomerOne;
+	boolean drawCustomerTwo;
+	long lastRender;
 	private PiazzaPanicGame piazzaPanicGame;
 
 	public Map(PiazzaPanicGame piazzaPanicGame) {
@@ -52,9 +62,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 
 	@Override
-	public void show(){
-		chefImage = new Texture(Gdx.files.internal("chef3.png"));
+	public void show() {
+		chefImage = new Texture(Gdx.files.internal("chef.png"));
 		tiledMap = new TmxMapLoader().load("Tiled/map.tmx");
+		customerOneImage = new Texture(Gdx.files.internal("person001.png"));
 
 		//Gets all properties from imported tiled map.
 		MapProperties properties = tiledMap.getProperties();
@@ -95,8 +106,37 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		sprites.add(chefTwo);
 
 		objects = tiledMap.getLayers().get(0).getObjects();
+		MapObject pantryAccess = objects.get("PantryAccess");
+		if (pantryAccess instanceof RectangleMapObject) {
+			RectangleMapObject pantryRectangle = (RectangleMapObject) pantryAccess;
+			this.ingredientsStation = pantryRectangle.getRectangle();}
+		else{
+			ingredientsStation = new Rectangle();}
 
 		Gdx.input.setInputProcessor(this);
+
+		lastRender = System.currentTimeMillis();
+
+		resetCustomerOne();
+		resetCustomerTwo();
+		drawCustomerOne = false;
+		drawCustomerTwo = false;
+	}
+
+	private void resetCustomerOne(){
+		customerOne = new Rectangle();
+		customerOne.x = 25;
+		customerOne.y = 25;
+		customerOne.width = 100;
+		customerOne.height = 100;
+	}
+
+	private void resetCustomerTwo(){
+		customerOne = new Rectangle();
+		customerOne.x = 600;
+		customerOne.y = 25;
+		customerOne.width = 100;
+		customerOne.height = 100;
 	}
 
 	/**
@@ -113,11 +153,32 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		batch.begin();
 		batch.draw(chefImage, chefOne.x, chefOne.y);
 		batch.draw(chefImage, chefTwo.x, chefTwo.y);
+
+		if (System.currentTimeMillis() - lastRender > 1000) {
+			Random random = new Random();
+			if (random.nextBoolean()){
+				drawCustomerOne = true;
+				System.out.println("PRINTED");
+			}
+			lastRender = System.currentTimeMillis();
+		}
+
+		if (drawCustomerOne){
+			if (customerOne.x > 240){
+				// TODO: Choose an order
+				drawCustomerOne = false;
+				resetCustomerOne();
+			}
+			customerOne.x += 50 * Gdx.graphics.getDeltaTime();
+			batch.draw(customerOneImage, customerOne.x, customerOne.y);
+
+		}
+
 		batch.end();
 	}
 
 	/**
-	 * Decided what to do with the click input that has been occured
+	 * Decided what to do with the click input that has been occurred
 	 * and runs relevant function.
 	 *
 	 * @param x X position of the area that has been clicked.
@@ -176,10 +237,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 				&& Gdx.graphics.getHeight() - y > sprite.getY() && Gdx.graphics.getHeight() - y < sprite.getHeight() + sprite.getY();
 	}
 
-	private boolean rectangleDetection(Rectangle sprite, float x, float y){
-		return sprite.contains(x, Gdx.graphics.getHeight() - y);
-	}
-
 	/**
 	 * Disposes all assets for cleaner exit.
 	 */
@@ -190,12 +247,11 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 	@Override
 	public boolean keyDown(int keycode) {
-		if (lastClickObject != true){
+		if (lastClickObject == true) {
+			return false;
+		} else {
 			charactorMovement(keycode);
 			return true;
-		}
-		else {
-			return false;
 		}
 	}
 
@@ -210,11 +266,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	}
 
 	private void charactorMovement(int keycode) {
-		MapObject ingredientStation = objects.get("Pantry access");
-		RectangleMapObject ingredientStationObject = (RectangleMapObject) ingredientStation;
-		if (rectangleDetection(ingredientStationObject.getRectangle(), lastClick.x, lastClick.y)) {
-			System.out.println(objects.get("Pantry access").getName());
-		}
 		if (keycode == 51){
 			lastClick.y += 400 * Gdx.graphics.getDeltaTime();
 		}
