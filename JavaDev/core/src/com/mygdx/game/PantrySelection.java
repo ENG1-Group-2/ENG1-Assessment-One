@@ -21,10 +21,13 @@ public class PantrySelection extends ScreenAdapter implements InputProcessor{
     OrthographicCamera camera;
     MapObjects objects;
 
-    private PiazzaPanicGame piazzaPanicGame;
+    final PiazzaPanicGame game;
+    int tileSize;
+    int mapWidth;
+    int mapHeight;
 
-    public PantrySelection(PiazzaPanicGame piazzaPanicGame) {
-        piazzaPanicGame = piazzaPanicGame;
+    public PantrySelection(final PiazzaPanicGame game) {
+        this.game = game;
     }
 
     @Override
@@ -32,6 +35,8 @@ public class PantrySelection extends ScreenAdapter implements InputProcessor{
         tiledMap = new TmxMapLoader().load("Tiled/pantry.tmx");
 
         camera = new OrthographicCamera();
+
+        Gdx.gl.glClearColor(135/255f, 206/255f, 235/255f, 1);
 
         //Gets all properties from imported tiled map.
         MapProperties properties = tiledMap.getProperties();
@@ -94,6 +99,7 @@ public class PantrySelection extends ScreenAdapter implements InputProcessor{
 
     private boolean checkClickOnFood(Rectangle food, int x, int y){
         // Y is inverted in LibGDX.
+        food.setY(tileSize * mapHeight - food.getY());
         return food.contains(x, Gdx.graphics.getHeight() - y);
     }
 

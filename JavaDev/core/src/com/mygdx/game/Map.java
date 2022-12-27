@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -67,10 +68,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	Recipe beefBurger;
 	ArrayList<Recipe> recipes;
 
-	private PiazzaPanicGame piazzaPanicGame;
+	final PiazzaPanicGame game;
 
-	public Map(PiazzaPanicGame piazzaPanicGame) {
-		piazzaPanicGame = piazzaPanicGame;
+	public Map(final PiazzaPanicGame game) {
+		this.game = game;
 	}
 
 	/**
@@ -120,18 +121,21 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		chefTwo.width = 64;
 		chefTwo.height = 64;
 
-		// Keep list of sprites to make checking clicks easier.
-		sprites.add(chefOne);
-		sprites.add(chefTwo);
-
 		// Get properties for ingredients stations rectangle stored in the tiled map.
 		objects = tiledMap.getLayers().get(0).getObjects();
 		MapObject pantryAccess = objects.get("PantryAccess");
 		if (pantryAccess instanceof RectangleMapObject) {
 			RectangleMapObject pantryRectangle = (RectangleMapObject) pantryAccess;
-			this.ingredientsStation = pantryRectangle.getRectangle();}
+			this.ingredientsStation = pantryRectangle.getRectangle();
+			this.ingredientsStation.setX(tileSize * mapWidth - ingredientsStation.getX());
+			this.ingredientsStation.setY(tileSize * mapHeight - ingredientsStation.getY());
+		}
 		else{
 			ingredientsStation = new Rectangle();}
+
+		// Keep list of sprites to make checking clicks easier.
+		sprites.add(chefOne);
+		sprites.add(chefTwo);
 
 		Gdx.input.setInputProcessor(this);
 
@@ -324,26 +328,13 @@ public class Map extends ScreenAdapter implements InputProcessor{
 				&& Gdx.graphics.getHeight() - y > sprite.getY() && Gdx.graphics.getHeight() - y < sprite.getHeight() + sprite.getY();
 	}
 
-	private boolean rectangleDetection(Rectangle sprite, float x, float y){
-		// Y is inverted in LibGDX.
-		return x > sprite.getX() && x < sprite.getX() + sprite.getWidth()
-				&& Gdx.graphics.getHeight() - y > sprite.getY() && Gdx.graphics.getHeight() - y < sprite.getHeight() + sprite.getY();
-	}
-
-	private boolean enterAreaCheck(Rectangle area, Rectangle sprite){
-		// TODO: Get pantry detection working.
-		// area.getY() - area.getHeight() < sprite.getY()
-		// area.getX() - area.getWidth() > sprite.getX()
-		return false;
-	}
-
-
 	/**
 	 * Disposes all assets for cleaner exit.
 	 */
 	@Override
-	public void dispose () {
+	public void dispose() {
 		tiledMap.dispose();
+		chefImage.dispose();
 	}
 
 	@Override
@@ -362,9 +353,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	}
 
 	private void charactorMovement(int keycode) {
-		if (enterAreaCheck(ingredientsStation, lastClick)){
-			// TODO: Change screen to ingredients screen.
-		}
 		if (keycode == 51){
 			lastClick.y += 400 * Gdx.graphics.getDeltaTime();
 		}
@@ -377,6 +365,16 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		else if (keycode == 32){
 			lastClick.x += 400 * Gdx.graphics.getDeltaTime();
 		}
+		if (lastClick.overlaps(ingredientsStation)){
+			// TODO: Change screen to ingredients screen.
+			game.setScreen(new PantrySelection(game));
+			dispose();
+		}
+	}
+
+	private boolean rectangleDetection(Rectangle sprite, float x, float y) {
+		return x > sprite.getX() && x < sprite.getX() + sprite.getWidth()
+				&& Gdx.graphics.getHeight() - y > sprite.getY() && Gdx.graphics.getHeight() - y < sprite.getHeight() + sprite.getY();
 	}
 
 	@Override
