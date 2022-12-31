@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
-
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
@@ -14,6 +15,9 @@ import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.graphics.GL20;
+
+import java.util.ArrayList;
 
 public class PantrySelection extends ScreenAdapter implements InputProcessor{
     TiledMap tiledMap;
@@ -25,18 +29,62 @@ public class PantrySelection extends ScreenAdapter implements InputProcessor{
     int tileSize;
     int mapWidth;
     int mapHeight;
+    Ingredient onion;
+    Ingredient pepper;
+    Ingredient lettuce;
+    Ingredient cookedChicken;
+    Ingredient saladDressing;
+    Ingredient pineapple;
+    Ingredient pizzaSauce;
+    Ingredient pizzaBase;
+    Ingredient burgerPatty;
+    Ingredient tuna;
+    Ingredient mayo;
+    Ingredient jacketPotato;
+    Ingredient breadBuns;
+    Ingredient ham;
+    ArrayList<Ingredient> shop = new ArrayList<>();
+    ArrayList<Ingredient> selection = new ArrayList<>();
 
     public PantrySelection(final PiazzaPanicGame game) {
         this.game = game;
     }
+
+    private void createPantryItem() {
+        pepper = new Ingredient("Peppers", false);
+        lettuce = new Ingredient("Lettuce", false);
+        cookedChicken = new PreChoppedIngredient("Chicken");
+        saladDressing = new PreChoppedIngredient("SaladDressing");
+        pineapple = new Ingredient("Pineapple", false);
+        pizzaSauce = new PreChoppedIngredient("PizzaSauce");
+        pizzaBase = new HotIngredient("Base", true, 5);
+        burgerPatty = new HotIngredient("BurgerPatty", true, 5);
+        mayo = new PreChoppedIngredient("Mayo");
+        // TODO: Add on tiled map.
+        tuna = new PreChoppedIngredient("Tuna");
+        jacketPotato = new HotIngredient("JacketPotato", false, 5);
+        breadBuns = new HotIngredient("Bun", false, 5);
+        ham = new PreChoppedIngredient("Ham");
+        selection.add(lettuce);
+        selection.add(cookedChicken);
+        selection.add(saladDressing);
+        selection.add(pineapple);
+        selection.add(pizzaSauce);
+        selection.add(pizzaSauce);
+        selection.add(burgerPatty);
+        selection.add(mayo);
+        selection.add(tuna);
+        selection.add(jacketPotato);
+        selection.add(breadBuns);
+        selection.add(ham);
+    }
+
 
     @Override
     public void show(){
         tiledMap = new TmxMapLoader().load("Tiled/pantry.tmx");
 
         camera = new OrthographicCamera();
-
-        Gdx.gl.glClearColor(135/255f, 206/255f, 235/255f, 1);
 
         //Gets all properties from imported tiled map.
         MapProperties properties = tiledMap.getProperties();
@@ -54,6 +102,8 @@ public class PantrySelection extends ScreenAdapter implements InputProcessor{
         objects = tiledMap.getLayers().get(0).getObjects();
 
         Gdx.input.setInputProcessor(this);
+
+        createPantryItem();
     }
 
     /**
@@ -62,12 +112,19 @@ public class PantrySelection extends ScreenAdapter implements InputProcessor{
      */
     @Override
     public void render(float delta) {
+        // Set black background anc clear screen
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         camera.update();
         tiledMapRenderer.setView(camera);
         tiledMapRenderer.render();
     }
     @Override
     public boolean keyDown(int keycode) {
+        if (keycode == Input.Keys.ESCAPE){
+            game.setScreen(new Map(game, shop));
+        }
         return false;
     }
 
@@ -88,18 +145,26 @@ public class PantrySelection extends ScreenAdapter implements InputProcessor{
             if (temp instanceof RectangleMapObject) {
                 RectangleMapObject tempRectangleObject = (RectangleMapObject) temp;
                 if (checkClickOnFood(tempRectangleObject.getRectangle(), screenX, screenY)) {
-                    System.out.println(objects.get(i).getName());
+                    boolean found = false;
+                    int counter = 0;
+                    while (found == false && counter < selection.size())
+                        if (selection.get(counter).getName() == tempRectangleObject.getName()){
+                            shop.add(selection.get(counter).copy());
+                            found = true;
+                        }
+                        counter++;
+                    }
                 }
 
             }
-        }
         return false;
+        }
     }
 
 
     private boolean checkClickOnFood(Rectangle food, int x, int y){
         // Y is inverted in LibGDX.
-        food.setY(tileSize * mapHeight - food.getY());
+        food.setX(tileSize * mapHeight - food.getX());
         return food.contains(x, Gdx.graphics.getHeight() - y);
     }
 

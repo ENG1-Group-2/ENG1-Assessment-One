@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
@@ -26,6 +27,7 @@ import java.util.Random;
  * Auto launches this screen in the current prototype.
  */
 public class Map extends ScreenAdapter implements InputProcessor{
+	ArrayList<Ingredient> pantryInventory;
 	TiledMap tiledMap;
 	OrthographicCamera camera;
 	TiledMapRenderer tiledMapRenderer;
@@ -44,35 +46,28 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	ArrayList<Rectangle> sprites = new ArrayList<>();
 	MapObjects objects;
 	Rectangle ingredientsStation;
+	Rectangle grill;
 	int customerCounter = 5;
 	boolean drawCustomerOne;
 	boolean drawCustomerTwo;
 	long lastRender;
-	Ingredient onion;
-	Ingredient pepper;
-	Ingredient lettuce;
-	Ingredient cookedChicken;
-	Ingredient saladDressing;
-	Ingredient pineapple;
-	Ingredient pizzaSauce;
-	Ingredient pizzaBase;
-	Ingredient burgerPatty;
-	Ingredient tuna;
-	Ingredient mayo;
-	Ingredient jacketPotato;
-	Ingredient breadBuns;
-	Ingredient ham;
 	Recipe hamAndPineapplePizza;
 	Recipe chickenSalad;
 	Recipe tunaJacketPotato;
 	Recipe beefBurger;
 	ArrayList<Recipe> recipes;
+	ArrayList<Recipe> orders = new ArrayList<>();
+	ArrayList<Ingredient> inventory = new ArrayList<>();
 
 	final PiazzaPanicGame game;
 
 	public Map(final PiazzaPanicGame game) {
 		this.game = game;
 	}
+
+	public Map(final PiazzaPanicGame game, ArrayList<Ingredient> pantryInventory){
+			this.game = game;
+			inventory.addAll(pantryInventory);}
 
 	/**
 	 * Loads the map and sprites.
@@ -128,10 +123,20 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			RectangleMapObject pantryRectangle = (RectangleMapObject) pantryAccess;
 			this.ingredientsStation = pantryRectangle.getRectangle();
 			this.ingredientsStation.setX(tileSize * mapWidth - ingredientsStation.getX());
-			this.ingredientsStation.setY(tileSize * mapHeight - ingredientsStation.getY());
+			// this.ingredientsStation.setY(tileSize * mapHeight - ingredientsStation.getY());
 		}
 		else{
 			ingredientsStation = new Rectangle();}
+
+		MapObject grillObject = objects.get("Grill");
+		if (grillObject instanceof RectangleMapObject) {
+			RectangleMapObject grillRectangle = (RectangleMapObject) grillObject;
+			this.grill = grillRectangle.getRectangle();
+			this.grill.setX(tileSize * mapWidth - grill.getX());
+			//this.grill.setY(tileSize * mapHeight - grill.getY());
+		}
+		else{
+			grill = new Rectangle();}
 
 		// Keep list of sprites to make checking clicks easier.
 		sprites.add(chefOne);
@@ -149,7 +154,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		drawCustomerTwo = false;
 
 		// Creating pantry and recipes using class defined in package.
-		createPantryItem();
 		createRecipes();
 	}
 
@@ -168,23 +172,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 		chickenSalad = new Recipe("Chicken Salad", 2);
 		recipes.add(chickenSalad);
-	}
-
-	private void createPantryItem() {
-		onion = new Ingredient("Onion", false);
-		pepper = new Ingredient("Peppers", false);
-		lettuce = new Ingredient("Lettuce", false);
-		cookedChicken = new PreChoppedIngredient("Chicken");
-		saladDressing = new PreChoppedIngredient("Salad Dressing");
-		pineapple = new Ingredient("Pineapple", false);
-		pizzaSauce = new PreChoppedIngredient("Pizza Sauce");
-		pizzaBase = new HotIngredient("Base", true, 5);
-		burgerPatty = new HotIngredient("BurgerPatty", true, 5);
-		mayo = new PreChoppedIngredient("Mayo");
-		tuna = new PreChoppedIngredient("Tuna");
-		jacketPotato = new HotIngredient("JacketPotato", false, 5);
-		breadBuns = new HotIngredient("BreadBuns", false, 5);
-		ham = new PreChoppedIngredient("Ham");
 	}
 
 	private void resetCustomerOne(){
@@ -209,6 +196,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	@Override
 	public void render(float delta) {
+		// Set black background anc clear screen
+		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
 		camera.update();
 		tiledMapRenderer.setView(camera);
 		tiledMapRenderer.render();
@@ -218,43 +209,43 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		batch.draw(chefImage, chefOne.x, chefOne.y);
 		batch.draw(chefImage, chefTwo.x, chefTwo.y);
 
-		//If it has been 20 seconds since a customer appeared.
-		if (System.currentTimeMillis() - lastRender > 20000) {
-			Random random = new Random();
-			// Randomly choose between customer one or two.
-			if (random.nextBoolean()){
-				drawCustomerOne = true;
+		if (customerCounter != 0) {
+			//If it has been 20 seconds since a customer appeared.
+			if (System.currentTimeMillis() - lastRender > 20000) {
+				Random random = new Random();
+				// Randomly choose between customer one or two.
+				if (random.nextBoolean()) {
+					drawCustomerOne = true;
+				} else {
+					drawCustomerTwo = true;
+				}
+				lastRender = System.currentTimeMillis();
 			}
-			else {
-				drawCustomerTwo = true;
+
+			// Keep on moving customers along per frame.
+			if (drawCustomerOne) {
+				// If it at the position it needs to be in.
+				if (customerOne.x > 240) {
+					drawCustomerOne = false;
+					randomOrderGeneration();
+					resetCustomerOne();
+
+				}
+				customerOne.x += 50 * Gdx.graphics.getDeltaTime();
+				batch.draw(customerOneImage, customerOne.x, customerOne.y);
+
 			}
-			lastRender = System.currentTimeMillis();
+
+			if (drawCustomerTwo) {
+				if (customerTwo.x < 340) {
+					drawCustomerTwo = false;
+					resetCustomerTwo();
+					randomOrderGeneration();
+				}
+				customerTwo.x -= 50 * Gdx.graphics.getDeltaTime();
+				batch.draw(customerTwoImage, customerTwo.x, customerTwo.y);
+			}
 		}
-
-		// Keep on moving customers along per frame.
-		if (drawCustomerOne){
-			// If it at the position it needs to be in.
-			if (customerOne.x > 240){
-				drawCustomerOne = false;
-				randomOrderGeneration();
-				resetCustomerOne();
-
-			}
-			customerOne.x += 50 * Gdx.graphics.getDeltaTime();
-			batch.draw(customerOneImage, customerOne.x, customerOne.y);
-
-		}
-
-		if (drawCustomerTwo){
-			if (customerTwo.x < 340){
-				drawCustomerTwo = false;
-				resetCustomerTwo();
-				randomOrderGeneration();
-			}
-			customerTwo.x -= 50 * Gdx.graphics.getDeltaTime();
-			batch.draw(customerTwoImage, customerTwo.x, customerTwo.y);
-		}
-
 		batch.end();
 	}
 
@@ -265,7 +256,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		// TODO: Add this to some form of data structure - currently just prints out.
 		Random random = new Random();
 		int index = random.nextInt(recipes.size());
-		System.out.println(recipes.get(index).getName());
+		orders.add(recipes.get(index));
+		System.out.println(orders);
 	}
 
 	/**
@@ -366,8 +358,12 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			lastClick.x += 400 * Gdx.graphics.getDeltaTime();
 		}
 		if (lastClick.overlaps(ingredientsStation)){
-			// TODO: Change screen to ingredients screen.
 			game.setScreen(new PantrySelection(game));
+			dispose();
+		}
+		if (lastClick.overlaps(grill)){
+			System.out.println("DETECTED");
+			game.setScreen(new Grill(game, inventory));
 			dispose();
 		}
 	}
