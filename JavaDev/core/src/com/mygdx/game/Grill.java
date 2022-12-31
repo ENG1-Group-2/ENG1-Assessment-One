@@ -88,23 +88,23 @@ public class Grill extends ScreenAdapter implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        boolean found = false;
-        int counter = 0;
-        while (found == false && counter < pantryInventory.size()){
-            if (pantryInventory.get(counter).getName() == "BurgerPatty" ||
-                    pantryInventory.get(counter).getName() == "Bun"){
-                if (grillOneItem != null){
-                    System.out.println(grillOneItem.endCook());
-                    grillOneItem = null;
-
-                }
-                else{
-                    grillOneItem = pantryInventory.get(counter);
-                    pantryInventory.get(counter).startToCook();
-                }
-            }
-            counter++;
+        if (grillOneItem != null){
+            System.out.println(grillOneItem.endCook());
+            grillOneItem = null;
         }
+        else{
+            boolean found = false;
+            int counter = 0;
+            while (found == false && counter < pantryInventory.size()){
+                if (pantryInventory.get(counter).getName() == "BurgerPatty" ||
+                        pantryInventory.get(counter).getName() == "Bun"){
+                    grillOneItem = pantryInventory.get(counter);
+                    pantryInventory.remove(counter);
+                    grillOneItem.startToCook();
+                    }
+                }
+                counter++;
+            }
         return false;
     }
 

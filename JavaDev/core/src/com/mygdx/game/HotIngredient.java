@@ -10,7 +10,7 @@ public class HotIngredient extends Ingredient {
 
     public HotIngredient(String name, Boolean chopped, long cookingTime) {
         super(name, chopped);
-        this.cookingTime = cookingTime * 1000;
+        this.cookingTime = cookingTime;
         cookingStart = 0;
     }
 
@@ -20,7 +20,7 @@ public class HotIngredient extends Ingredient {
 
     public boolean startToCook() {
         cookingStart = System.currentTimeMillis();
-        return false;
+        return true;
     }
 
     public boolean endCook(){
@@ -34,12 +34,12 @@ public class HotIngredient extends Ingredient {
     }
 
     public void correctlyCooked() {
-        Long timeDifference = (long) (this.cookingStart);
+        Long timeDifference = this.cookingEnd - this.cookingStart;
         timeDifference = (timeDifference/1000) % 60;
-        if (timeDifference > cookingTime * 0.2 - cookingTime && timeDifference < cookingTime * 0.2 + cookingTime) {
-            isBurnt = false;
-        } else {
+        if (timeDifference > cookingTime - cookingTime * 0.2 && timeDifference <  cookingTime + cookingTime * 0.2) {
             isBurnt = true;
+        } else {
+            isBurnt = false;
         }
     }
     public HotIngredient copy(){
