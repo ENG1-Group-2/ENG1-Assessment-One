@@ -42,7 +42,7 @@ public class Ingredient {
         return false;
     }
 
-    public float getCookingStartTime() {
+    public long getCookingStartTime() {
         return 0;
     }
 }

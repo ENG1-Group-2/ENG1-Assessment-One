@@ -159,7 +159,7 @@ public class PantrySelection extends ScreenAdapter implements InputProcessor{
             }
         return false;
         }
-    }
+
 
 
     private boolean checkClickOnFood(Rectangle food, int x, int y){

@@ -4,7 +4,10 @@ import com.badlogic.gdx.Gdx;
 
 public class HotIngredient extends Ingredient {
     public long cookingTime;
-    float cookingStart;
+    long cookingStart;
+    long cookingEnd;
+    boolean isBurnt;
+
     public HotIngredient(String name, Boolean chopped, long cookingTime) {
         super(name, chopped);
         this.cookingTime = cookingTime * 1000;
@@ -16,26 +19,29 @@ public class HotIngredient extends Ingredient {
     }
 
     public boolean startToCook() {
-        cookingStart = Gdx.graphics.getDeltaTime();
+        cookingStart = System.currentTimeMillis();
         return false;
     }
 
     public boolean endCook(){
-        if (cookingStart == 0){
-            return false;
-        }
-        if (System.currentTimeMillis() - cookingStart > cookingTime){
-            return false;
-        }
-        else{
-            return true;
-        }
+        cookingEnd = System.currentTimeMillis();
+        correctlyCooked();
+        return isBurnt;
     }
 
-    public float getCookingStart() {
+    public long getCookingStartTime() {
         return cookingStart;
     }
 
+    public void correctlyCooked() {
+        Long timeDifference = (long) (this.cookingStart);
+        timeDifference = (timeDifference/1000) % 60;
+        if (timeDifference > cookingTime * 0.2 - cookingTime && timeDifference < cookingTime * 0.2 + cookingTime) {
+            isBurnt = false;
+        } else {
+            isBurnt = true;
+        }
+    }
     public HotIngredient copy(){
         return new HotIngredient(name, chopped, cookingTime);
     }

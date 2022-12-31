@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -11,7 +12,6 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import sun.util.resources.cldr.ext.TimeZoneNames_ka;
 
 import java.util.ArrayList;
 
@@ -53,6 +53,10 @@ public class Grill extends ScreenAdapter implements InputProcessor {
 
     @Override
     public void render(float delta){
+        // Set black background anc clear screen
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         camera.update();
         tiledMapRenderer.setView(camera);
         tiledMapRenderer.render();
@@ -60,8 +64,9 @@ public class Grill extends ScreenAdapter implements InputProcessor {
         batch.begin();
 
         if (grillOneItem != null){
-            float timeDifference = System.currentTimeMillis() - grillOneItem.getCookingStartTime();
-            font.draw(batch, Float.toString(timeDifference), 10, 10);
+            Long timeDifference = (long) (System.currentTimeMillis() - grillOneItem.getCookingStartTime());
+            timeDifference = (timeDifference/1000) % 60;
+            font.draw(batch, Long.toString(timeDifference), 10, 10);
         }
 
         batch.end();
@@ -88,9 +93,10 @@ public class Grill extends ScreenAdapter implements InputProcessor {
         while (found == false && counter < pantryInventory.size()){
             if (pantryInventory.get(counter).getName() == "BurgerPatty" ||
                     pantryInventory.get(counter).getName() == "Bun"){
-                System.out.println("ran");
-                if (pantryInventory.get(counter).hasCookStarted()){
-                    pantryInventory.get(counter).endCook();
+                if (grillOneItem != null){
+                    System.out.println(grillOneItem.endCook());
+                    grillOneItem = null;
+
                 }
                 else{
                     grillOneItem = pantryInventory.get(counter);
