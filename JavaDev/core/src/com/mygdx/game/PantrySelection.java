@@ -123,6 +123,7 @@ public class PantrySelection extends ScreenAdapter implements InputProcessor{
     @Override
     public boolean keyDown(int keycode) {
         if (keycode == Input.Keys.ESCAPE){
+            System.out.println(shop);
             game.setScreen(new Map(game, shop));
         }
         return false;
@@ -147,18 +148,18 @@ public class PantrySelection extends ScreenAdapter implements InputProcessor{
                 if (checkClickOnFood(tempRectangleObject.getRectangle(), screenX, screenY)) {
                     boolean found = false;
                     int counter = 0;
-                    while (found == false && counter < selection.size())
-                        if (selection.get(counter).getName() == tempRectangleObject.getName()){
+                    while (found == false && counter < selection.size()) {
+                        if (selection.get(counter).getName() == tempRectangleObject.getName()) {
                             shop.add(selection.get(counter).copy());
                             found = true;
                         }
                         counter++;
                     }
                 }
-
             }
-        return false;
         }
+        return false;
+    }
 
 
 

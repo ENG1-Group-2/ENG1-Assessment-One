@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -210,40 +211,42 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		batch.draw(chefImage, chefTwo.x, chefTwo.y);
 
 		if (customerCounter != 0) {
-			//If it has been 20 seconds since a customer appeared.
-			if (System.currentTimeMillis() - lastRender > 20000) {
-				Random random = new Random();
-				// Randomly choose between customer one or two.
-				if (random.nextBoolean()) {
-					drawCustomerOne = true;
-				} else {
-					drawCustomerTwo = true;
+			if (customerCounter != 0) {
+				//If it has been 20 seconds since a customer appeared.
+				if (System.currentTimeMillis() - lastRender > 20000) {
+					Random random = new Random();
+					// Randomly choose between customer one or two.
+					if (random.nextBoolean()) {
+						drawCustomerOne = true;
+					} else {
+						drawCustomerTwo = true;
+					}
+					lastRender = System.currentTimeMillis();
 				}
-				lastRender = System.currentTimeMillis();
-			}
 
-			// Keep on moving customers along per frame.
-			if (drawCustomerOne) {
-				// If it at the position it needs to be in.
-				if (customerOne.x > 240) {
-					drawCustomerOne = false;
-					randomOrderGeneration();
-					resetCustomerOne();
+				// Keep on moving customers along per frame.
+				if (drawCustomerOne) {
+					// If it at the position it needs to be in.
+					if (customerOne.x > 240) {
+						drawCustomerOne = false;
+						randomOrderGeneration();
+						resetCustomerOne();
+
+					}
+					customerOne.x += 50 * Gdx.graphics.getDeltaTime();
+					batch.draw(customerOneImage, customerOne.x, customerOne.y);
 
 				}
-				customerOne.x += 50 * Gdx.graphics.getDeltaTime();
-				batch.draw(customerOneImage, customerOne.x, customerOne.y);
 
-			}
-
-			if (drawCustomerTwo) {
-				if (customerTwo.x < 340) {
-					drawCustomerTwo = false;
-					resetCustomerTwo();
-					randomOrderGeneration();
+				if (drawCustomerTwo) {
+					if (customerTwo.x < 340) {
+						drawCustomerTwo = false;
+						resetCustomerTwo();
+						randomOrderGeneration();
+					}
+					customerTwo.x -= 50 * Gdx.graphics.getDeltaTime();
+					batch.draw(customerTwoImage, customerTwo.x, customerTwo.y);
 				}
-				customerTwo.x -= 50 * Gdx.graphics.getDeltaTime();
-				batch.draw(customerTwoImage, customerTwo.x, customerTwo.y);
 			}
 		}
 		batch.end();
@@ -331,6 +334,9 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 	@Override
 	public boolean keyDown(int keycode) {
+		if (keycode == Input.Keys.H){
+			game.setScreen(new InfoScreen(game, orders, pantryInventory));
+		}
 		if (lastClickObject == true) {
 			return false;
 		} else {

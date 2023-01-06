@@ -5,7 +5,7 @@
  <tileset firstgid="157" source="Tiles.tsx"/>
  <objectgroup id="6" name="Starting Point">
   <object id="91" name="PantryAccess" x="598" y="222" width="144" height="90"/>
-  <object id="95" name="Grill" x="98" y="82" width="88" height="86"/>
+  <object id="95" name="Grill" x="92" y="34" width="98" height="94"/>
  </objectgroup>
  <layer id="1" name="Base Map" width="30" height="20">
   <data encoding="csv">

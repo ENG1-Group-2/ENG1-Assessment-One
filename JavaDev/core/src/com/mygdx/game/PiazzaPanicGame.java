@@ -19,10 +19,7 @@ public class PiazzaPanicGame extends Game{
         shapeRenderer = new ShapeRenderer();
         font = new BitmapFont();
 
-        ArrayList<Ingredient> temp = new ArrayList<>();
-        temp.add(new HotIngredient("BurgerPatty", true, 30));
-        setScreen(new Grill(this, temp));
-        //setScreen(new Map(this));
+        setScreen(new Map(this));
     }
 
     public void render(){
