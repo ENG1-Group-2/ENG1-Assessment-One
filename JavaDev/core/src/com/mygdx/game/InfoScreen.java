@@ -23,6 +23,11 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
         this.ingredients = ingredients;}
 
     @Override
+    public void show(){
+        Gdx.input.setInputProcessor(this);
+    }
+
+    @Override
     public void render(float delta){
         // Set black background anc clear screen
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -44,6 +49,8 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
         font.draw(batch, output, 200, 200);
 
         batch.end();
+
+
     }
 
     @Override

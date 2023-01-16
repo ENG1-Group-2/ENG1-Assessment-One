@@ -206,7 +206,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	@Override
 	public void render(float delta) {
-		System.out.println(pantryInventory);
      	// Set black background anc clear screen
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -387,11 +386,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			game.setScreen(new Grill(game, inventory));
 			dispose();
 		}
-	}
-
-	private boolean rectangleDetection(Rectangle sprite, float x, float y) {
-		return x > sprite.getX() && x < sprite.getX() + sprite.getWidth()
-				&& Gdx.graphics.getHeight() - y > sprite.getY() && Gdx.graphics.getHeight() - y < sprite.getHeight() + sprite.getY();
 	}
 
 	@Override
