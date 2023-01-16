@@ -43,11 +43,14 @@ public class PantrySelection extends ScreenAdapter implements InputProcessor{
     Ingredient jacketPotato;
     Ingredient breadBuns;
     Ingredient ham;
-    ArrayList<Ingredient> shop = new ArrayList<>();
+    ArrayList<Ingredient> pantrySelection;
+    ArrayList<Recipe> orders;
     ArrayList<Ingredient> selection = new ArrayList<>();
 
-    public PantrySelection(final PiazzaPanicGame game) {
+    public PantrySelection(final PiazzaPanicGame game, ArrayList<Ingredient> pantrySelection, ArrayList<Recipe> orders) {
         this.game = game;
+        this.pantrySelection = pantrySelection;
+        this.orders = orders;
     }
 
     private void createPantryItem() {
@@ -57,7 +60,8 @@ public class PantrySelection extends ScreenAdapter implements InputProcessor{
         saladDressing = new PreChoppedIngredient("SaladDressing");
         pineapple = new Ingredient("Pineapple", false);
         pizzaSauce = new PreChoppedIngredient("PizzaSauce");
-        pizzaBase = new HotIngredient("Base", true, 5);
+        pizzaBase = new HotIngredient("PizzaBase", true, 5);
+        // TODO: Add on tiled map.
         burgerPatty = new HotIngredient("BurgerPatty", true, 5);
         mayo = new PreChoppedIngredient("Mayo");
         // TODO: Add on tiled map.
@@ -69,7 +73,6 @@ public class PantrySelection extends ScreenAdapter implements InputProcessor{
         selection.add(cookedChicken);
         selection.add(saladDressing);
         selection.add(pineapple);
-        selection.add(pizzaSauce);
         selection.add(pizzaSauce);
         selection.add(burgerPatty);
         selection.add(mayo);
@@ -113,7 +116,7 @@ public class PantrySelection extends ScreenAdapter implements InputProcessor{
     @Override
     public void render(float delta) {
         // Set black background anc clear screen
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         camera.update();
@@ -122,9 +125,9 @@ public class PantrySelection extends ScreenAdapter implements InputProcessor{
     }
     @Override
     public boolean keyDown(int keycode) {
+        System.out.println(orders);
         if (keycode == Input.Keys.ESCAPE){
-            System.out.println(shop);
-            game.setScreen(new Map(game, shop));
+            game.setScreen(new Map(game, pantrySelection, orders));
         }
         return false;
     }
@@ -146,14 +149,16 @@ public class PantrySelection extends ScreenAdapter implements InputProcessor{
             if (temp instanceof RectangleMapObject) {
                 RectangleMapObject tempRectangleObject = (RectangleMapObject) temp;
                 if (checkClickOnFood(tempRectangleObject.getRectangle(), screenX, screenY)) {
-                    boolean found = false;
-                    int counter = 0;
-                    while (found == false && counter < selection.size()) {
-                        if (selection.get(counter).getName() == tempRectangleObject.getName()) {
-                            shop.add(selection.get(counter).copy());
+                    String tempRectangleValue = tempRectangleObject.getName();
+                    Boolean found = false;
+                    Integer counter = 0;
+                    while (found == false){
+                        counter ++;
+                        String selectionListValue = selection.get(counter).getName();
+                        if (tempRectangleValue.equals(selectionListValue)){
                             found = true;
+                            pantrySelection.add(selection.get(counter).copy());
                         }
-                        counter++;
                     }
                 }
             }

@@ -34,4 +34,8 @@ public class Recipe {
         return name;
     }
 
+    public Recipe copy(){
+        return new Recipe(name, steps);
+    }
+
 }

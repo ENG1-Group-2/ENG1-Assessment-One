@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class InfoScreen extends ScreenAdapter implements InputProcessor {
     final PiazzaPanicGame game;
-    ArrayList<Recipe> ingredients;
+    ArrayList<Ingredient> ingredients;
     ArrayList<Recipe> orders;
     BitmapFont font = new BitmapFont();
     SpriteBatch batch = new SpriteBatch();
@@ -20,7 +20,7 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
     public InfoScreen(final PiazzaPanicGame game, ArrayList<Recipe> orders, ArrayList<Ingredient> ingredients){
         this.game = game;
         this.orders = orders;
-        this.ingredients = orders;}
+        this.ingredients = ingredients;}
 
     @Override
     public void render(float delta){
@@ -32,11 +32,12 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
 
         String output;
         output = "Orders";
-        for (int i=0; i > orders.size(); i++){
+        for (int i=0; i < orders.size(); i++){
             output += "\n" + orders.get(i).getName();
         }
         output += "\nIngredients";
-        for (int i=0; i > ingredients.size(); i++){
+
+        for (int i=0; i < ingredients.size(); i++){
             output += "\n" + ingredients.get(i).getName();
         }
 
@@ -53,7 +54,7 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
     @Override
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.ESCAPE){
-            game.setScreen(new Map(game));
+            game.setScreen(new Map(game, ingredients, orders));
         }
         return false;
     }

@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -57,18 +56,28 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	Recipe tunaJacketPotato;
 	Recipe beefBurger;
 	ArrayList<Recipe> recipes;
-	ArrayList<Recipe> orders = new ArrayList<>();
+	ArrayList<Recipe> orders;
 	ArrayList<Ingredient> inventory = new ArrayList<>();
 
 	final PiazzaPanicGame game;
 
 	public Map(final PiazzaPanicGame game) {
 		this.game = game;
+		pantryInventory = new ArrayList<Ingredient>();
+		orders = new ArrayList<Recipe>();
 	}
 
-	public Map(final PiazzaPanicGame game, ArrayList<Ingredient> pantryInventory){
+	public Map(final PiazzaPanicGame game, ArrayList<Ingredient> pantryInventoryPrev, ArrayList<Recipe> ordersPrev){
 			this.game = game;
-			inventory.addAll(pantryInventory);}
+			pantryInventory = new ArrayList<Ingredient>();
+			for (int i=0; i < pantryInventoryPrev.size(); i++){
+				pantryInventory.add(pantryInventoryPrev.get(i).copy());
+			}
+			orders = new ArrayList<Recipe>();
+			for (int i=0; i < ordersPrev.size(); i++){
+				orders.add(ordersPrev.get(i).copy());
+			}
+	}
 
 	/**
 	 * Loads the map and sprites.
@@ -197,7 +206,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	@Override
 	public void render(float delta) {
-		// Set black background anc clear screen
+		System.out.println(pantryInventory);
+     	// Set black background anc clear screen
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -256,11 +266,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		// Keep track of how many customers have appeared.
 		customerCounter -= 1;
 
-		// TODO: Add this to some form of data structure - currently just prints out.
 		Random random = new Random();
 		int index = random.nextInt(recipes.size());
 		orders.add(recipes.get(index));
-		System.out.println(orders);
+		// System.out.println(orders);
 	}
 
 	/**
@@ -364,7 +373,13 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			lastClick.x += 400 * Gdx.graphics.getDeltaTime();
 		}
 		if (lastClick.overlaps(ingredientsStation)){
-			game.setScreen(new PantrySelection(game));
+			if (pantryInventory == null){
+				game.setScreen(new PantrySelection(game, new ArrayList<Ingredient>(), orders));
+			}
+			else{
+				game.setScreen(new PantrySelection(game, pantryInventory, orders));
+			}
+
 			dispose();
 		}
 		if (lastClick.overlaps(grill)){
