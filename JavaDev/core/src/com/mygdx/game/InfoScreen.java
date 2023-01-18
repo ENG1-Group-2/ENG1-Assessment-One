@@ -45,8 +45,9 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
         for (int i=0; i < ingredients.size(); i++){
             output += "\n" + ingredients.get(i).getName();
         }
-
-        font.draw(batch, output, 200, 200);
+        output += "\n" + Gdx.graphics.getWidth() + "\n" + Gdx.graphics.getHeight();
+        font.getData().setScale(Math.round(Gdx.graphics.getHeight() / 250), Math.round(Gdx.graphics.getHeight() / 250));
+        font.draw(batch, output, Math.round(Gdx.graphics.getWidth() * 0.1), Math.round(Gdx.graphics.getHeight() * 0.9));
 
         batch.end();
 

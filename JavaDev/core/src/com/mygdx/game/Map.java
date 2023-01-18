@@ -58,6 +58,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	ArrayList<Recipe> recipes;
 	ArrayList<Recipe> orders;
 	ArrayList<Ingredient> inventory = new ArrayList<>();
+	int screenWidth = Gdx.graphics.getWidth();
+	int screenHeight = Gdx.graphics.getHeight();
+	boolean chefMove = false;
+	int keyCode;
 
 	final PiazzaPanicGame game;
 
@@ -115,25 +119,23 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 		//Position chefs near staff door.
 		chefOne = new Rectangle();
-		chefOne.x = 600;
-		chefOne.y = 350;
-		chefOne.width = 64;
-		chefOne.height = 64;
+		chefOne.x = Math.round(screenWidth * 0.92);
+		chefOne.y = Math.round(screenHeight * 0.73);
+		chefOne.width = Math.round(screenWidth * 0.1);
+		chefOne.height = Math.round(screenWidth * 0.1);
 
 		chefTwo = new Rectangle();
-		chefTwo.x = 600;
-		chefTwo.y = 400;
-		chefTwo.width = 64;
-		chefTwo.height = 64;
+		chefTwo.x = Math.round(screenWidth * 0.92);
+		chefTwo.y = Math.round(screenHeight * 0.83);
+		chefTwo.width = Math.round(screenWidth * 0.1);
+		chefTwo.height = Math.round(screenWidth * 0.1);
 
 		// Get properties for ingredients stations rectangle stored in the tiled map.
 		objects = tiledMap.getLayers().get(0).getObjects();
 		MapObject pantryAccess = objects.get("PantryAccess");
 		if (pantryAccess instanceof RectangleMapObject) {
 			RectangleMapObject pantryRectangle = (RectangleMapObject) pantryAccess;
-			this.ingredientsStation = pantryRectangle.getRectangle();
-			this.ingredientsStation.setX(tileSize * mapWidth - ingredientsStation.getX());
-			// this.ingredientsStation.setY(tileSize * mapHeight - ingredientsStation.getY());
+			this.ingredientsStation = scaleObject(pantryRectangle.getRectangle(), tileSize * mapWidth, tileSize * mapHeight);
 		}
 		else{
 			ingredientsStation = new Rectangle();}
@@ -141,9 +143,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		MapObject grillObject = objects.get("Grill");
 		if (grillObject instanceof RectangleMapObject) {
 			RectangleMapObject grillRectangle = (RectangleMapObject) grillObject;
-			this.grill = grillRectangle.getRectangle();
-			this.grill.setX(tileSize * mapWidth - grill.getX());
-			//this.grill.setY(tileSize * mapHeight - grill.getY());
+			this.grill = scaleObject(grillRectangle.getRectangle(), tileSize * mapWidth, tileSize * mapHeight);
 		}
 		else{
 			grill = new Rectangle();}
@@ -165,6 +165,14 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 		// Creating pantry and recipes using class defined in package.
 		createRecipes();
+	}
+
+	private Rectangle scaleObject(Rectangle object, int mapWidth, int mapHeight) {
+		object.setX(Math.round((object.getX() / mapWidth) * screenWidth));
+		object.setY(Math.round(((mapHeight - object.getY()) / mapHeight) * screenHeight));
+		object.setWidth(Math.round((object.getWidth() / mapWidth) * screenWidth));
+		object.setHeight(Math.round((object.getHeight() / mapHeight) * screenHeight));
+		return object;
 	}
 
 	private void createRecipes() {
@@ -206,7 +214,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	@Override
 	public void render(float delta) {
-     	// Set black background anc clear screen
+     	// Set black background and clear screen
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -214,10 +222,19 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		tiledMapRenderer.setView(camera);
 		tiledMapRenderer.render();
 
+		if ((screenWidth != Gdx.graphics.getWidth()) || (screenHeight != Gdx.graphics.getHeight())) {
+			screenWidth = Gdx.graphics.getWidth();
+			screenHeight = Gdx.graphics.getHeight();
+		}
+
+		if (chefMove) {
+			characterMovement(keyCode);
+		}
+
 		//Images needs to be render based upon changes.
 		batch.begin();
-		batch.draw(chefImage, chefOne.x, chefOne.y);
-		batch.draw(chefImage, chefTwo.x, chefTwo.y);
+		batch.draw(chefImage, chefOne.x, chefOne.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
+		batch.draw(chefImage, chefTwo.x, chefTwo.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
 
 		if (customerCounter != 0) {
 			if (customerCounter != 0) {
@@ -279,11 +296,12 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 * @param y Y position of the area that has been clicked.
 	 */
 	public void clickEvent (int x, int y){
-		if (lastClickObject) {
+		/*if (lastClickObject) {
 			onClickMove(x, y);
 		} else {
 			onClickObject(x, y);
-		}
+		}*/
+		onClickObject(x, y);
 	}
 
 	/**
@@ -310,11 +328,11 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 * @param x X position of the area that has been clicked.
 	 * @param y Y position of the area that has been clicked.
 	 */
-	private void onClickMove(int x, int y){
+/*	private void onClickMove(int x, int y){
 		lastClick.x = x;
 		lastClick.y = Gdx.graphics.getHeight() - y;
 		lastClickObject = false;
-	}
+	}*/
 
 	/**
 	 * Checks whether the users click is on any of the sprites.
@@ -346,30 +364,35 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			game.setScreen(new InfoScreen(game, orders, pantryInventory));
 		}
 		if (lastClickObject == true) {
-			return false;
-		} else {
-			charactorMovement(keycode);
-			return true;
+			/*return false;
+		} else {*/
+			chefMove = true;
+			keyCode = keycode;
 		}
+			return true;
 	}
 
 	@Override
 	public boolean keyUp(int keycode) {
+		if ((keycode == 51) || (keycode == 29) || (keycode == 47) || (keycode == 32)) {
+			chefMove = false;
+		}
 		return false;
 	}
 
-	private void charactorMovement(int keycode) {
+	private void characterMovement(int keycode) {
+		int pixelPerFrame = Math.round((Gdx.graphics.getWidth() / 3) * Gdx.graphics.getDeltaTime());
 		if (keycode == 51){
-			lastClick.y += 400 * Gdx.graphics.getDeltaTime();
+			lastClick.y += pixelPerFrame;
 		}
 		else if (keycode == 29){
-			lastClick.x -= 400 * Gdx.graphics.getDeltaTime();
+			lastClick.x -= pixelPerFrame;
 		}
 		else if (keycode == 47){
-			lastClick.y -= 400 * Gdx.graphics.getDeltaTime();
+			lastClick.y -= pixelPerFrame;
 		}
 		else if (keycode == 32){
-			lastClick.x += 400 * Gdx.graphics.getDeltaTime();
+			lastClick.x += pixelPerFrame;
 		}
 		if (lastClick.overlaps(ingredientsStation)){
 			if (pantryInventory == null){
@@ -378,7 +401,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			else{
 				game.setScreen(new PantrySelection(game, pantryInventory, orders));
 			}
-
 			dispose();
 		}
 		if (lastClick.overlaps(grill)){
