@@ -17,9 +17,9 @@ import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Main game screen which enables the user to control the map.
@@ -28,6 +28,8 @@ import java.util.Random;
  */
 public class Map extends ScreenAdapter implements InputProcessor{
 	ArrayList<Ingredient> pantryInventory;
+
+	ArrayList<Ingredient> shoppingList = new ArrayList<>();
 	TiledMap tiledMap;
 	OrthographicCamera camera;
 	TiledMapRenderer tiledMapRenderer;
@@ -35,6 +37,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	Rectangle chefTwo;
 	Rectangle customerOne;
 	Rectangle customerTwo;
+	Rectangle chiller;
+	Rectangle grill;
+	Rectangle choppingStation;
+	Rectangle assemblyStation;
 	Texture chefImage;
 	Texture customerOneImage;
 	Texture customerTwoImage;
@@ -44,26 +50,33 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	//Keep track of whether a relevant object was clicked previously.
 	Boolean lastClickObject;
 	ArrayList<Rectangle> sprites = new ArrayList<>();
-	MapObjects objects;
-	Rectangle ingredientsStation;
-	Rectangle grill;
 	int customerCounter = 5;
 	boolean drawCustomerOne;
 	boolean drawCustomerTwo;
 	long lastRender;
-	Recipe hamAndPineapplePizza;
 	Recipe chickenSalad;
-	Recipe tunaJacketPotato;
 	Recipe beefBurger;
 	ArrayList<Recipe> recipes;
 	ArrayList<Recipe> orders;
-	ArrayList<Ingredient> inventory = new ArrayList<>();
 	int screenWidth = Gdx.graphics.getWidth();
 	int screenHeight = Gdx.graphics.getHeight();
 	boolean chefMove = false;
 	int keyCode;
+	int mapWidth;
+	int mapHeight;
+	int tileSize;
+	Rectangle ingredientsForSalad;
+	Ingredient saladDressing;
+	Ingredient burgerPatty;
+	Ingredient breadBuns;
+	Ingredient lettuce;
+	Ingredient pepper;
+	Ingredient cookedChicken;
+	Ingredient grillOneObject;
+	Ingredient grillTwoObject;
 
 	final PiazzaPanicGame game;
+
 
 	public Map(final PiazzaPanicGame game) {
 		this.game = game;
@@ -71,7 +84,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		orders = new ArrayList<Recipe>();
 	}
 
-	public Map(final PiazzaPanicGame game, ArrayList<Ingredient> pantryInventoryPrev, ArrayList<Recipe> ordersPrev){
+	public Map(final PiazzaPanicGame game, ArrayList<Ingredient> pantryInventoryPrev, ArrayList<Recipe> ordersPrev, int customerCounter){
 			this.game = game;
 			pantryInventory = new ArrayList<Ingredient>();
 			for (int i=0; i < pantryInventoryPrev.size(); i++){
@@ -81,6 +94,26 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			for (int i=0; i < ordersPrev.size(); i++){
 				orders.add(ordersPrev.get(i).copy());
 			}
+			this.customerCounter = customerCounter;
+	}
+
+	/**
+	 * Loads given rectangle from the Tiled map.
+	 *
+	 * @param objectName Name property of the object layer from tile map.
+	 * @param objectLayer The layer of the map which the rectangle is located in.
+	 * @return Rectangle from the tiled map.
+	 */
+	public Rectangle loadRectangle(String objectName, int objectLayer) {
+		// Get properties for ingredients stations rectangle stored in the tiled map.
+		MapObjects objects = tiledMap.getLayers().get(objectLayer).getObjects();
+		MapObject grillObject = objects.get(objectName);
+		if (grillObject instanceof RectangleMapObject) {
+			RectangleMapObject grillRectangle = (RectangleMapObject) grillObject;
+			return scaleObject(grillRectangle.getRectangle(), tileSize * mapWidth, tileSize * mapHeight);
+		} else {
+			throw new IllegalArgumentException("This object does not exist in the object layer");
+		}
 	}
 
 	/**
@@ -88,7 +121,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 * Get the properties for the map.
 	 * Creates the camera and sets the initial position of the chefs.
 	 */
-
 	@Override
 	public void show() {
 		chefImage = new Texture(Gdx.files.internal("chef.png"));
@@ -107,9 +139,9 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 		camera = new OrthographicCamera();
 
-		int mapWidth = properties.get("width", Integer.class);
-		int mapHeight = properties.get("height", Integer.class);
-		int tileSize = properties.get("tilewidth", Integer.class);
+		mapWidth = properties.get("width", Integer.class);
+		mapHeight = properties.get("height", Integer.class);
+		tileSize = properties.get("tilewidth", Integer.class);
 
 		//Tiles are square so width and height will be the same.
 		camera.setToOrtho(false, mapWidth * tileSize, mapHeight * tileSize);
@@ -130,6 +162,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		chefTwo.width = Math.round(screenWidth * 0.1);
 		chefTwo.height = Math.round(screenWidth * 0.1);
 
+		/*
 		// Get properties for ingredients stations rectangle stored in the tiled map.
 		objects = tiledMap.getLayers().get(0).getObjects();
 		MapObject pantryAccess = objects.get("PantryAccess");
@@ -139,14 +172,15 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		}
 		else{
 			ingredientsStation = new Rectangle();}
+		 */
 
-		MapObject grillObject = objects.get("Grill");
-		if (grillObject instanceof RectangleMapObject) {
-			RectangleMapObject grillRectangle = (RectangleMapObject) grillObject;
-			this.grill = scaleObject(grillRectangle.getRectangle(), tileSize * mapWidth, tileSize * mapHeight);
-		}
-		else{
-			grill = new Rectangle();}
+		ingredientsForSalad = loadRectangle("IngredientsForSalad", 0);
+		choppingStation = loadRectangle("ChoppingStation", 0);
+		assemblyStation = loadRectangle("Assembly", 0);
+		chiller = loadRectangle("Chiller", 0);
+		grill = loadRectangle("Grill", 0);
+
+		createIngredients();
 
 		// Keep list of sprites to make checking clicks easier.
 		sprites.add(chefOne);
@@ -165,9 +199,46 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 		// Creating pantry and recipes using class defined in package.
 		createRecipes();
+
+		// Usage of both grills.
+		grillOneObject = null;
+		grillTwoObject = null;
 	}
 
-	private Rectangle scaleObject(Rectangle object, int mapWidth, int mapHeight) {
+	public String displayGrillInfomation(){
+		String temp = "";
+		if (grillOneObject != null){
+			Long timeDifference = (long) (System.currentTimeMillis() - grillOneObject.getCookingStartTime());
+			timeDifference = (timeDifference/1000) % 60;
+			temp += "Grill One Timer:" + timeDifference;
+			if (timeDifference >= grillOneObject.getCookingTime() &&
+					(chefOne.overlaps(grill) || chefTwo.overlaps(grill))){
+				grillOneObject.endCook();
+				grillOneObject = null;
+			}
+		}
+		if (grillTwoObject != null){
+			Long timeDifference = (long) (System.currentTimeMillis() - grillTwoObject.getCookingStartTime());
+			timeDifference = (timeDifference/1000) % 60;
+			temp += "Grill Two Timer:" + timeDifference;
+			if (timeDifference >= grillTwoObject.getCookingTime() &&
+					(chefOne.overlaps(grill) || chefTwo.overlaps(grill))){
+				grillTwoObject.endCook();
+				grillTwoObject = null;
+			}
+		}
+		return temp;
+	}
+
+	public void createIngredients(){
+		lettuce = new Ingredient("Lettuce", false, false);
+		pepper = new Ingredient("Peppers", false, false);
+		cookedChicken = new Ingredient("Chicken", true, false);
+		saladDressing = new Ingredient("SaladDressing", true, false);
+		burgerPatty = new HotIngredient("BurgerPatty", true, 45);
+		breadBuns = new HotIngredient("Bun", true, 15);
+	}
+	public Rectangle scaleObject(Rectangle object, int mapWidth, int mapHeight) {
 		object.setX(Math.round((object.getX() / mapWidth) * screenWidth));
 		object.setY(Math.round(((mapHeight - object.getY()) / mapHeight) * screenHeight));
 		object.setWidth(Math.round((object.getWidth() / mapWidth) * screenWidth));
@@ -179,16 +250,18 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		// Store all recipes in an array list to randomly choose an index.
 		recipes = new ArrayList<>(4);
 
-		hamAndPineapplePizza = new Recipe("Ham and Pineapple Pizza", 3);
-		recipes.add(hamAndPineapplePizza);
+		//TODO: NEW RECIPE
+		//hamAndPineapplePizza = new Recipe("Ham and Pineapple Pizza", 3);
+		//recipes.add(hamAndPineapplePizza);
 
-		tunaJacketPotato = new Recipe("Tuna Jacket Potato", 2);
-		recipes.add(tunaJacketPotato);
+		//TODO: NEW RECIPE
+		//tunaJacketPotato = new Recipe("Tuna Jacket Potato", 2);
+		//recipes.add(tunaJacketPotato);
 
-		beefBurger = new Recipe("Beef Burger", 2);
+		beefBurger = new Recipe("Beef Burger", new ArrayList<Ingredient>(Arrays.asList(breadBuns.copy(), burgerPatty.copy(), lettuce.copy())));
 		recipes.add(beefBurger);
 
-		chickenSalad = new Recipe("Chicken Salad", 2);
+		chickenSalad = new Recipe("Chicken Salad", new ArrayList<Ingredient>(Arrays.asList(saladDressing.copy(), cookedChicken.copy(), lettuce.copy(), pepper.copy())));
 		recipes.add(chickenSalad);
 	}
 
@@ -214,6 +287,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	@Override
 	public void render(float delta) {
+		System.out.println(customerCounter);
      	// Set black background and clear screen
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -237,9 +311,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		batch.draw(chefImage, chefTwo.x, chefTwo.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
 
 		if (customerCounter != 0) {
-			if (customerCounter != 0) {
 				//If it has been 20 seconds since a customer appeared.
-				if (System.currentTimeMillis() - lastRender > 20000) {
+				if (System.currentTimeMillis() - lastRender > 500) {
 					Random random = new Random();
 					// Randomly choose between customer one or two.
 					if (random.nextBoolean()) {
@@ -272,9 +345,12 @@ public class Map extends ScreenAdapter implements InputProcessor{
 					}
 					customerTwo.x -= 50 * Gdx.graphics.getDeltaTime();
 					batch.draw(customerTwoImage, customerTwo.x, customerTwo.y);
-				}
 			}
 		}
+
+		BitmapFont font = new BitmapFont();
+		font.draw(batch, displayGrillInfomation(), 10, 10);
+
 		batch.end();
 	}
 
@@ -284,8 +360,12 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 		Random random = new Random();
 		int index = random.nextInt(recipes.size());
-		orders.add(recipes.get(index));
-		// System.out.println(orders);
+		Recipe newOrder = recipes.get(index).copy();
+		orders.add(newOrder);
+
+		for (Ingredient ingredients: newOrder.getIngredients()){
+			shoppingList.add(ingredients);
+		}
 	}
 
 	/**
@@ -301,6 +381,9 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		} else {
 			onClickObject(x, y);
 		}*/
+		if (rectangleDetection(grill, x, y)){
+			System.out.println("SUCCESSFULL CLICK");
+		}
 		onClickObject(x, y);
 	}
 
@@ -343,7 +426,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 * @param y Y position of the area that has been clicked.
 	 * @return [Boolean] Whether the user has clicked on the sprite or not.
 	 */
-	private boolean rectangleDetection(Rectangle sprite, int x, int y){
+	private boolean rectangleDetection(Rectangle sprite, float x, float y){
 		// Y is inverted in LibGDX.
 		return x > sprite.getX() && x < sprite.getX() + sprite.getWidth()
 				&& Gdx.graphics.getHeight() - y > sprite.getY() && Gdx.graphics.getHeight() - y < sprite.getHeight() + sprite.getY();
@@ -361,7 +444,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	@Override
 	public boolean keyDown(int keycode) {
 		if (keycode == Input.Keys.H){
-			game.setScreen(new InfoScreen(game, orders, pantryInventory));
+			game.setScreen(new InfoScreen(game, orders, pantryInventory, customerCounter));
 		}
 		if (lastClickObject == true) {
 			/*return false;
@@ -394,7 +477,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		else if (keycode == 32){
 			lastClick.x += pixelPerFrame;
 		}
-		if (lastClick.overlaps(ingredientsStation)){
+		/** if (lastClick.overlaps(ingredientsStation)){
 			if (pantryInventory == null){
 				game.setScreen(new PantrySelection(game, new ArrayList<Ingredient>(), orders));
 			}
@@ -407,6 +490,109 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			System.out.println("DETECTED");
 			game.setScreen(new Grill(game, inventory));
 			dispose();
+		}
+		 */
+		// TODO: A neater way of object detection.
+		if (rectangleDetection(ingredientsForSalad, lastClick.getX(), lastClick.getY())){
+			addSaladIngredients();
+		}
+		if (rectangleDetection(choppingStation, lastClick.getX(), lastClick.getY())){
+			chopIngredients();
+		}
+		if (rectangleDetection(assemblyStation, lastClick.getX(), lastClick.getY())){
+			assembly();
+		}
+		if (rectangleDetection(chiller, lastClick.getX(), lastClick.getY())){
+			getChillerItems();
+		}
+		if (rectangleDetection(grill, lastClick.getX(), lastClick.getY())){
+			chooseGrillItems();
+		}
+	}
+
+	public void getChillerItems(){
+		Set<Ingredient> setCopy = new HashSet<>(shoppingList);
+		for (Ingredient newItem: shoppingList){
+			//TODO: Remove once added!
+			switch (newItem.getName()){
+				case "Bun":
+					pantryInventory.add(newItem);
+					setCopy.remove(newItem);
+				case "BurgerPatty":
+					pantryInventory.add(newItem);
+					setCopy.remove(newItem);
+			}
+		}
+		shoppingList = new ArrayList<>(setCopy);
+		//TODO: Display on screen.
+		System.out.println("Ingredients Collected CHILLER");
+	}
+
+	public void addSaladIngredients(){
+		Set<Ingredient> setCopy = new HashSet<>(shoppingList);
+		for (Ingredient newItem: shoppingList){
+			//TODO: Remove once added!
+			switch (newItem.getName()){
+				case "SaladDressing":
+					pantryInventory.add(newItem);
+					setCopy.remove(newItem);
+				case "Chicken":
+					pantryInventory.add(newItem);
+					setCopy.remove(newItem);
+				case "Lettuce":
+					pantryInventory.add(newItem);
+					setCopy.remove(newItem);
+				case "Peppers":
+					pantryInventory.add(newItem);
+					setCopy.remove(newItem);
+			}
+		}
+		shoppingList = new ArrayList<>(setCopy);
+		//TODO: Display on screen.
+		System.out.println("Ingredients Collected SALAD");
+	}
+
+	public void chopIngredients(){
+		// TODO: Timing mechanism + staff.
+		for (Ingredient ingredient: pantryInventory){
+			ingredient.chopIngredient();
+		}
+		// TODO: Digital Message!
+		System.out.println("INGREDIENTS CHOPPED!");
+	}
+
+	public void assembly() {
+		for (Recipe order : orders) {
+			order.verifyCompletion();
+			if (order.assembled == true) {
+				System.out.println("COMPLETED AN ORDER");
+				//TODO: Display on map.
+			}
+		}
+	}
+
+	public void chooseGrillItems(){
+		for (Ingredient rawItem: pantryInventory) {
+			//TODO: Remove once added!
+			if (rawItem instanceof HotIngredient && ((HotIngredient) rawItem).hasCookStarted() == false){
+				switch (rawItem.getName()) {
+					case "Bun":
+						grillItem(rawItem);
+					case "BurgerPatty":
+						grillItem(rawItem);
+				}
+			}
+		}
+	}
+
+	public void grillItem(Ingredient toCook){
+		if (grillOneObject == null){
+			grillOneObject = toCook;
+			toCook.startToCook();
+		}
+		else{
+			grillTwoObject = toCook;
+			toCook.startToCook();
 		}
 	}
 

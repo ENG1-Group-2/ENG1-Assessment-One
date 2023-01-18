@@ -25,6 +25,9 @@ public class Grill extends ScreenAdapter implements InputProcessor {
     OrthographicCamera camera;
     TiledMapRenderer tiledMapRenderer;
 
+    public Grill(final PiazzaPanicGame game){
+        this.game = game;}
+
     public Grill(final PiazzaPanicGame game, ArrayList<Ingredient> pantryInventory){
         this.game = game;
         this.pantryInventory = pantryInventory;}

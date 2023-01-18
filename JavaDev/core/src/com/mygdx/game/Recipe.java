@@ -3,39 +3,44 @@ package com.mygdx.game;
 import java.util.ArrayList;
 
 public class Recipe {
-    ArrayList<ArrayList<String>> instructions;
-    int steps;
-    boolean followingProcedure;
-    boolean finished;
+    ArrayList<Ingredient> ingredients;
     String name;
-    public Recipe(String name, int steps){
-        this.name = name;
-        this.steps = steps;
-        // Instructions in the following format: machine needed to use
-        // and ingredient.
-        instructions = new ArrayList<>(steps);
-        this.followingProcedure = false;
-        this.finished = false;
-    }
+    Boolean assembled;
 
-    public void addStep(ArrayList<String> step){
-        this.instructions.add(step);
+    public Recipe(String name, ArrayList<Ingredient> ingredients){
+        this.name = name;
+        this.ingredients = ingredients;
+        this.assembled = false;
     }
 
     public Boolean verifyCompletion(){
-        if (instructions.isEmpty()){
-            return true;
+        for (Ingredient ingredient: ingredients){
+            if (ingredient.getChopped() == false || ingredient.getCooked() == false){
+                assembled = false;
+                return false;
+            }
         }
-        else {
-            return false;
-        }
+        assembled = true;
+        return true;
     }
+
+
     public String getName(){
         return name;
     }
 
     public Recipe copy(){
-        return new Recipe(name, steps);
+        ArrayList<Ingredient> newMemoryIngredients = (ArrayList<Ingredient>) ingredients.clone();
+        return new Recipe(name, newMemoryIngredients);
     }
 
+    public ArrayList<Ingredient> getIngredients(){
+        return ingredients;
+    }
+
+    public Boolean getAssembled() {
+        return assembled;
+    }
 }
+
+

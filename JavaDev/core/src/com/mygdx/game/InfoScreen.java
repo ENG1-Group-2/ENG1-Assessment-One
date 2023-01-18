@@ -16,11 +16,13 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
     ArrayList<Recipe> orders;
     BitmapFont font = new BitmapFont();
     SpriteBatch batch = new SpriteBatch();
+    int customerCounter;
 
-    public InfoScreen(final PiazzaPanicGame game, ArrayList<Recipe> orders, ArrayList<Ingredient> ingredients){
+    public InfoScreen(final PiazzaPanicGame game, ArrayList<Recipe> orders, ArrayList<Ingredient> ingredients, int customerCounter){
         this.game = game;
         this.orders = orders;
-        this.ingredients = ingredients;}
+        this.ingredients = ingredients;
+        this.customerCounter = customerCounter;}
 
     @Override
     public void show(){
@@ -43,7 +45,7 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
         output += "\nIngredients";
 
         for (int i=0; i < ingredients.size(); i++){
-            output += "\n" + ingredients.get(i).getName();
+            output += "\n" + ingredients.get(i).getName() + ingredients.get(i).getCooked() + ingredients.get(i).getChopped();
         }
         output += "\n" + Gdx.graphics.getWidth() + "\n" + Gdx.graphics.getHeight();
         font.getData().setScale(Math.round(Gdx.graphics.getHeight() / 250), Math.round(Gdx.graphics.getHeight() / 250));
@@ -62,7 +64,7 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
     @Override
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.ESCAPE){
-            game.setScreen(new Map(game, ingredients, orders));
+            game.setScreen(new Map(game, ingredients, orders, customerCounter));
         }
         return false;
     }
