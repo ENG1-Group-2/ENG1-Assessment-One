@@ -82,6 +82,11 @@ public class Map extends ScreenAdapter implements InputProcessor{
     Music menuMusic;
     Sound grillSound;
     Iterator<Ingredient> iterator;
+    Long ingredientsForSaladTime = 0L;
+    Long choppingStationTime = 0L;
+    Long assemblyStationTime = 0L;
+    Long chillerTime = 0L;
+    Long grillTime = 0L;
 
 
     public Map(final PiazzaPanicGame game) {
@@ -500,21 +505,45 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		 */
 		// TODO: A neater way of object detection.
 		if (rectangleDetection(ingredientsForSalad, lastClick.getX(), lastClick.getY())){
-			addSaladIngredients();
+            if (timerStations(ingredientsForSaladTime)) {
+                addSaladIngredients();
+                ingredientsForSaladTime = System.currentTimeMillis();
+            }
 		}
 		if (rectangleDetection(choppingStation, lastClick.getX(), lastClick.getY())){
-			chopIngredients();
+            if (timerStations(choppingStationTime)) {
+                addSaladIngredients();
+                choppingStationTime = System.currentTimeMillis();
+            }
 		}
 		if (rectangleDetection(assemblyStation, lastClick.getX(), lastClick.getY())){
-			assembly();
+            if (timerStations(assemblyStationTime)) {
+                assembly();
+                assemblyStationTime = System.currentTimeMillis();
+            }
 		}
 		if (rectangleDetection(chiller, lastClick.getX(), lastClick.getY())){
-			getChillerItems();
+            if (timerStations(chillerTime)) {
+                getChillerItems();
+                chillerTime = System.currentTimeMillis();
+            }
 		}
 		if (rectangleDetection(grill, lastClick.getX(), lastClick.getY())){
-			chooseGrillItems();
+            if (timerStations(grillTime)) {
+                chooseGrillItems();
+                grillTime = System.currentTimeMillis();
+            }
 		}
 	}
+
+    public Boolean timerStations(Long timePara){
+       if (timePara == 0 || System.currentTimeMillis() - timePara > 15000){
+           return true;
+        }
+        else{
+            return false;
+        }
+    }
 
 	public void getChillerItems(){
 		/**for (Ingredient newItem: shoppingList){
@@ -526,6 +555,9 @@ public class Map extends ScreenAdapter implements InputProcessor{
 					pantryInventory.add(newItem);
 			}
 		}*/
+        if (shoppingList.isEmpty()){
+            return;
+        }
         iterator = shoppingList.iterator();
         Ingredient tempObject = iterator.next();
         while (iterator.hasNext()){
@@ -549,13 +581,15 @@ public class Map extends ScreenAdapter implements InputProcessor{
                 iteratorItem = iterator.next();
             }
             iterator.remove();
+            return iteratorItem;
         }
         else{
             if (iterator.hasNext()) {
                 iteratorItem = iterator.next();
+                return iteratorItem;
             }
+            return null;
         }
-        return iteratorItem;
     }
 
 
@@ -579,6 +613,9 @@ public class Map extends ScreenAdapter implements InputProcessor{
 					setCopy.remove(newItem);
 			}
 			*/
+        if (shoppingList.isEmpty()){
+            return;
+        }
         iterator = shoppingList.iterator();
         Ingredient tempObject = iterator.next();
         while (iterator.hasNext()){
