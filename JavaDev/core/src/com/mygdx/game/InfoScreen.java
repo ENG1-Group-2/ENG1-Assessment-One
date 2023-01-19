@@ -14,15 +14,17 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
     final PiazzaPanicGame game;
     ArrayList<Ingredient> ingredients;
     ArrayList<Recipe> orders;
+    ArrayList<Ingredient> shoppingList;
     BitmapFont font = new BitmapFont();
     SpriteBatch batch = new SpriteBatch();
     int customerCounter;
 
-    public InfoScreen(final PiazzaPanicGame game, ArrayList<Recipe> orders, ArrayList<Ingredient> ingredients, int customerCounter){
+    public InfoScreen(final PiazzaPanicGame game, ArrayList<Recipe> orders, ArrayList<Ingredient> ingredients, int customerCounter, ArrayList<Ingredient> shoppingList){
         this.game = game;
         this.orders = orders;
         this.ingredients = ingredients;
-        this.customerCounter = customerCounter;}
+        this.customerCounter = customerCounter;
+        this.shoppingList = shoppingList;}
 
     @Override
     public void show(){
@@ -64,7 +66,7 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
     @Override
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.ESCAPE){
-            game.setScreen(new Map(game, ingredients, orders, customerCounter));
+            game.setScreen(new Map(game, ingredients, orders, customerCounter, shoppingList));
         }
         return false;
     }

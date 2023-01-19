@@ -20,6 +20,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.util.*;
 
@@ -31,7 +32,7 @@ import java.util.*;
 public class Map extends ScreenAdapter implements InputProcessor{
 	ArrayList<Ingredient> pantryInventory;
 
-	ArrayList<Ingredient> shoppingList = new ArrayList<>();
+	ArrayList<Ingredient> shoppingList;
 	TiledMap tiledMap;
 	OrthographicCamera camera;
 	TiledMapRenderer tiledMapRenderer;
@@ -80,25 +81,22 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	final PiazzaPanicGame game;
     Music menuMusic;
     Sound grillSound;
+    Iterator<Ingredient> iterator;
 
 
     public Map(final PiazzaPanicGame game) {
 		this.game = game;
 		pantryInventory = new ArrayList<Ingredient>();
 		orders = new ArrayList<Recipe>();
+        shoppingList = new ArrayList<Ingredient>();
 	}
 
-	public Map(final PiazzaPanicGame game, ArrayList<Ingredient> pantryInventoryPrev, ArrayList<Recipe> ordersPrev, int customerCounter){
+	public Map(final PiazzaPanicGame game, ArrayList<Ingredient> pantryInventoryPrev, ArrayList<Recipe> ordersPrev, int customerCounter, ArrayList<Ingredient> shoppingListPrev){
 			this.game = game;
-			pantryInventory = new ArrayList<Ingredient>();
-			for (int i=0; i < pantryInventoryPrev.size(); i++){
-				pantryInventory.add(pantryInventoryPrev.get(i).copy());
-			}
-			orders = new ArrayList<Recipe>();
-			for (int i=0; i < ordersPrev.size(); i++){
-				orders.add(ordersPrev.get(i).copy());
-			}
+			this.pantryInventory = pantryInventoryPrev;
+            this.orders = ordersPrev;
 			this.customerCounter = customerCounter;
+            this.shoppingList = shoppingListPrev;
 	}
 
 	/**
@@ -452,7 +450,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	@Override
 	public boolean keyDown(int keycode) {
 		if (keycode == Input.Keys.H){
-			game.setScreen(new InfoScreen(game, orders, pantryInventory, customerCounter));
+			game.setScreen(new InfoScreen(game, orders, pantryInventory, customerCounter, shoppingList));
 		}
 		if (lastClickObject == true) {
 			/*return false;
@@ -519,24 +517,50 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	}
 
 	public void getChillerItems(){
-		Set<Ingredient> setCopy = new HashSet<>(shoppingList);
-		for (Ingredient newItem: shoppingList){
+		/**for (Ingredient newItem: shoppingList){
 			//TODO: Remove once added!
 			switch (newItem.getName()){
 				case "Bun":
 					pantryInventory.add(newItem);
-					setCopy.remove(newItem);
 				case "BurgerPatty":
 					pantryInventory.add(newItem);
-					setCopy.remove(newItem);
 			}
-		}
-		shoppingList = new ArrayList<>(setCopy);
+		}*/
+        iterator = shoppingList.iterator();
+        Ingredient tempObject = iterator.next();
+        while (iterator.hasNext()){
+            switch (tempObject.getName()){
+                case "Bun":
+                    tempObject = moveToNextObject(tempObject, true);
+                case "BurgerPatty":
+                    tempObject = moveToNextObject(tempObject, true);
+                default:
+                    tempObject = moveToNextObject(tempObject, false);
+            }
+        }
 		//TODO: Display on screen.
 		System.out.println("Ingredients Collected CHILLER");
 	}
 
+    public Ingredient moveToNextObject(Ingredient iteratorItem, Boolean delete){
+        if (delete){
+            pantryInventory.add(iteratorItem);
+            if (iterator.hasNext()) {
+                iteratorItem = iterator.next();
+            }
+            iterator.remove();
+        }
+        else{
+            if (iterator.hasNext()) {
+                iteratorItem = iterator.next();
+            }
+        }
+        return iteratorItem;
+    }
+
+
 	public void addSaladIngredients(){
+        /*
 		Set<Ingredient> setCopy = new HashSet<>(shoppingList);
 		for (Ingredient newItem: shoppingList){
 			//TODO: Remove once added!
@@ -554,8 +578,24 @@ public class Map extends ScreenAdapter implements InputProcessor{
 					pantryInventory.add(newItem);
 					setCopy.remove(newItem);
 			}
+			*/
+        for (Iterator<Ingredient> iterator = shoppingList.iterator(); iterator.hasNext();){
+            Ingredient tempObject = iterator.next();
+            switch (tempObject.getName()){
+                case "SaladDressing":
+                    pantryInventory.add(tempObject);
+                    iterator.remove();
+                case "Chicken":
+                    pantryInventory.add(tempObject);
+                    iterator.remove();
+                case "Lettuce":
+                    pantryInventory.add(tempObject);
+                    iterator.remove();
+                case "Peppers":
+                    pantryInventory.add(tempObject);
+                    iterator.remove();
+            }
 		}
-		shoppingList = new ArrayList<>(setCopy);
 		//TODO: Display on screen.
 		System.out.println("Ingredients Collected SALAD");
 	}
