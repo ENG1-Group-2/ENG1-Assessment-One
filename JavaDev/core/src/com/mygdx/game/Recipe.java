@@ -30,7 +30,11 @@ public class Recipe {
     }
 
     public Recipe copy(){
-        ArrayList<Ingredient> newMemoryIngredients = (ArrayList<Ingredient>) ingredients.clone();
+        // Need a deep copy.
+        ArrayList<Ingredient> newMemoryIngredients = new ArrayList<>();
+        for (Ingredient ingredient: ingredients){
+            newMemoryIngredients.add(ingredient.copy());
+        }
         return new Recipe(name, newMemoryIngredients);
     }
 

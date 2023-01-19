@@ -579,23 +579,22 @@ public class Map extends ScreenAdapter implements InputProcessor{
 					setCopy.remove(newItem);
 			}
 			*/
-        for (Iterator<Ingredient> iterator = shoppingList.iterator(); iterator.hasNext();){
-            Ingredient tempObject = iterator.next();
+        iterator = shoppingList.iterator();
+        Ingredient tempObject = iterator.next();
+        while (iterator.hasNext()){
             switch (tempObject.getName()){
                 case "SaladDressing":
-                    pantryInventory.add(tempObject);
-                    iterator.remove();
+                    tempObject = moveToNextObject(tempObject, true);
                 case "Chicken":
-                    pantryInventory.add(tempObject);
-                    iterator.remove();
+                    tempObject = moveToNextObject(tempObject, true);
                 case "Lettuce":
-                    pantryInventory.add(tempObject);
-                    iterator.remove();
+                    tempObject = moveToNextObject(tempObject, true);
                 case "Peppers":
-                    pantryInventory.add(tempObject);
-                    iterator.remove();
+                    tempObject = moveToNextObject(tempObject, true);
+                default:
+                    tempObject = moveToNextObject(tempObject, false);
             }
-		}
+        }
 		//TODO: Display on screen.
 		System.out.println("Ingredients Collected SALAD");
 	}
