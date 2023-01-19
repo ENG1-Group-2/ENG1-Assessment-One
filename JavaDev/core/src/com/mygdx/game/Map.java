@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -78,6 +79,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 	final PiazzaPanicGame game;
     Music menuMusic;
+    Sound grillSound;
 
 
     public Map(final PiazzaPanicGame game) {
@@ -571,6 +573,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		for (Recipe order : orders) {
 			order.verifyCompletion();
 			if (order.assembled == true) {
+                Sound assemblySound = Gdx.audio.newSound(Gdx.files.internal("assembly station sound.wav"));
+                assemblySound.play();
 				System.out.println("COMPLETED AN ORDER");
 				//TODO: Display on map.
 			}
@@ -584,8 +588,12 @@ public class Map extends ScreenAdapter implements InputProcessor{
 				switch (rawItem.getName()) {
 					case "Bun":
 						grillItem(rawItem);
+                        grillSound = Gdx.audio.newSound(Gdx.files.internal("grill_sound.wav"));
+                        grillSound.play();
 					case "BurgerPatty":
 						grillItem(rawItem);
+                        grillSound = Gdx.audio.newSound(Gdx.files.internal("grill_sound.wav"));
+                        grillSound.play();
 				}
 			}
 		}
