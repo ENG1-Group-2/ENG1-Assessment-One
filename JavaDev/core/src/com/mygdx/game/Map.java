@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -76,9 +77,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	Ingredient grillTwoObject;
 
 	final PiazzaPanicGame game;
+    Music menuMusic;
 
 
-	public Map(final PiazzaPanicGame game) {
+    public Map(final PiazzaPanicGame game) {
 		this.game = game;
 		pantryInventory = new ArrayList<Ingredient>();
 		orders = new ArrayList<Recipe>();
@@ -123,6 +125,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	@Override
 	public void show() {
+        menuMusic = Gdx.audio.newMusic(Gdx.files.internal("background.wav"));
+        menuMusic.setLooping(true);
+        menuMusic.play();
+
 		chefImage = new Texture(Gdx.files.internal("chef.png"));
 		tiledMap = new TmxMapLoader().load("Tiled/map.tmx");
 		customerOneImage = new Texture(Gdx.files.internal("person001.png"));

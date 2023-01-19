@@ -13,3 +13,5 @@ https://www.freeimages.com/clipart/map-tile-metal-grill-1-x-1-5296645
 https://styloo.itch.io/kitchen
 
 https://opengameart.org/content/kitchen-assets-for-letscookjam
+
+https://www.playonloop.com/royalty-free-music/corporate-and-media/
