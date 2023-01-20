@@ -96,12 +96,13 @@ public class Map extends ScreenAdapter implements InputProcessor{
         shoppingList = new ArrayList<Ingredient>();
 	}
 
-	public Map(final PiazzaPanicGame game, ArrayList<Ingredient> pantryInventoryPrev, ArrayList<Recipe> ordersPrev, int customerCounter, ArrayList<Ingredient> shoppingListPrev){
+	public Map(final PiazzaPanicGame game, ArrayList<Ingredient> pantryInventoryPrev, ArrayList<Recipe> ordersPrev, int customerCounter, ArrayList<Ingredient> shoppingListPrev, Music menuMusic){
 			this.game = game;
 			this.pantryInventory = pantryInventoryPrev;
             this.orders = ordersPrev;
 			this.customerCounter = customerCounter;
             this.shoppingList = shoppingListPrev;
+			this.menuMusic = menuMusic;
 	}
 
 	/**
@@ -130,9 +131,11 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	@Override
 	public void show() {
-        menuMusic = Gdx.audio.newMusic(Gdx.files.internal("background.wav"));
-        menuMusic.setLooping(true);
-        menuMusic.play();
+		if (menuMusic == null || menuMusic.isPlaying() == false) {
+			menuMusic = Gdx.audio.newMusic(Gdx.files.internal("background.wav"));
+			menuMusic.setLooping(true);
+			menuMusic.play();
+		}
 
 		chefImage = new Texture(Gdx.files.internal("chef.png"));
 		tiledMap = new TmxMapLoader().load("Tiled/map.tmx");
@@ -455,7 +458,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	@Override
 	public boolean keyDown(int keycode) {
 		if (keycode == Input.Keys.H){
-			game.setScreen(new InfoScreen(game, orders, pantryInventory, customerCounter, shoppingList));
+			game.setScreen(new InfoScreen(game, orders, pantryInventory, customerCounter, shoppingList, menuMusic));
 		}
 		if (lastClickObject == true) {
 			/*return false;
@@ -512,7 +515,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		}
 		if (rectangleDetection(choppingStation, lastClick.getX(), lastClick.getY())){
             if (timerStations(choppingStationTime)) {
-                addSaladIngredients();
+                chopIngredients();
                 choppingStationTime = System.currentTimeMillis();
             }
 		}
@@ -559,22 +562,28 @@ public class Map extends ScreenAdapter implements InputProcessor{
             return;
         }
         iterator = shoppingList.iterator();
-        Ingredient tempObject = iterator.next();
         while (iterator.hasNext()){
+			Ingredient tempObject = iterator.next();
             switch (tempObject.getName()){
                 case "Bun":
-                    tempObject = moveToNextObject(tempObject, true);
+                    //tempObject = moveToNextObject(tempObject, true);
+					iterator.remove();
+					pantryInventory.add(tempObject);
+					break;
                 case "BurgerPatty":
-                    tempObject = moveToNextObject(tempObject, true);
+                    //tempObject = moveToNextObject(tempObject, true);
+					iterator.remove();
+					pantryInventory.add(tempObject);
+					break;
                 default:
-                    tempObject = moveToNextObject(tempObject, false);
+                    //tempObject = moveToNextObject(tempObject, false);
             }
         }
 		//TODO: Display on screen.
 		System.out.println("Ingredients Collected CHILLER");
 	}
 
-    public Ingredient moveToNextObject(Ingredient iteratorItem, Boolean delete){
+    /*public Ingredient moveToNextObject(Ingredient iteratorItem, Boolean delete){
         if (delete){
             pantryInventory.add(iteratorItem);
             if (iterator.hasNext()) {
@@ -590,7 +599,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
             }
             return null;
         }
-    }
+    }*/
 
 
 	public void addSaladIngredients(){
@@ -617,19 +626,31 @@ public class Map extends ScreenAdapter implements InputProcessor{
             return;
         }
         iterator = shoppingList.iterator();
-        Ingredient tempObject = iterator.next();
         while (iterator.hasNext()){
-            switch (tempObject.getName()){
+			Ingredient tempObject = iterator.next();
+			switch (tempObject.getName()){
                 case "SaladDressing":
-                    tempObject = moveToNextObject(tempObject, true);
-                case "Chicken":
-                    tempObject = moveToNextObject(tempObject, true);
-                case "Lettuce":
-                    tempObject = moveToNextObject(tempObject, true);
-                case "Peppers":
-                    tempObject = moveToNextObject(tempObject, true);
-                default:
-                    tempObject = moveToNextObject(tempObject, false);
+                    //tempObject = moveToNextObject(tempObject, true);
+					iterator.remove();
+					pantryInventory.add(tempObject);
+					break;
+				case "Chicken":
+                    //tempObject = moveToNextObject(tempObject, true);
+					iterator.remove();
+					pantryInventory.add(tempObject);
+					break;
+				case "Lettuce":
+                    //tempObject = moveToNextObject(tempObject, true);
+					iterator.remove();
+					pantryInventory.add(tempObject);
+					break;
+				case "Peppers":
+                    //tempObject = moveToNextObject(tempObject, true);
+					iterator.remove();
+					pantryInventory.add(tempObject);
+					break;
+				default:
+                    //tempObject = moveToNextObject(tempObject, false);
             }
         }
 		//TODO: Display on screen.

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -15,16 +16,20 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
     ArrayList<Ingredient> ingredients;
     ArrayList<Recipe> orders;
     ArrayList<Ingredient> shoppingList;
+    Music menuMusic;
     BitmapFont font = new BitmapFont();
     SpriteBatch batch = new SpriteBatch();
     int customerCounter;
 
-    public InfoScreen(final PiazzaPanicGame game, ArrayList<Recipe> orders, ArrayList<Ingredient> ingredients, int customerCounter, ArrayList<Ingredient> shoppingList){
+    public InfoScreen(final PiazzaPanicGame game, ArrayList<Recipe> orders, ArrayList<Ingredient> ingredients, int customerCounter, ArrayList<Ingredient> shoppingList, Music menuMusic){
         this.game = game;
         this.orders = orders;
         this.ingredients = ingredients;
         this.customerCounter = customerCounter;
-        this.shoppingList = shoppingList;}
+        this.shoppingList = shoppingList;
+        this.menuMusic = menuMusic;
+
+    }
 
     @Override
     public void show(){
@@ -39,20 +44,22 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
 
         batch.begin();
 
-        String output;
-        output = "Orders";
+        String orderList;
+        orderList = "Orders";
         for (int i=0; i < orders.size(); i++){
-            output += "\n" + orders.get(i).getName();
+            orderList += "\n" + orders.get(i).getName();
         }
-        output += "\nIngredients";
+
+        String ingredientList;
+        ingredientList = "Ingredients";
 
         for (int i=0; i < ingredients.size(); i++){
-            output += "\n" + ingredients.get(i).getName() + ingredients.get(i).getCooked() + ingredients.get(i).getChopped();
+            ingredientList += "\n" + ingredients.get(i).getName();
         }
-        output += "\n" + Gdx.graphics.getWidth() + "\n" + Gdx.graphics.getHeight();
+        orderList += "\n" + Gdx.graphics.getWidth() + "\n" + Gdx.graphics.getHeight();
         font.getData().setScale(Math.round(Gdx.graphics.getHeight() / 250), Math.round(Gdx.graphics.getHeight() / 250));
-        font.draw(batch, output, Math.round(Gdx.graphics.getWidth() * 0.1), Math.round(Gdx.graphics.getHeight() * 0.9));
-
+        font.draw(batch, orderList, Math.round(Gdx.graphics.getWidth() * 0.1), Math.round(Gdx.graphics.getHeight() * 0.9));
+        font.draw(batch, ingredientList, Math.round(Gdx.graphics.getWidth() * 0.6), Math.round(Gdx.graphics.getHeight() * 0.9));
         batch.end();
 
 
@@ -66,7 +73,7 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
     @Override
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.ESCAPE){
-            game.setScreen(new Map(game, ingredients, orders, customerCounter, shoppingList));
+            game.setScreen(new Map(game, ingredients, orders, customerCounter, shoppingList, menuMusic));
         }
         return false;
     }

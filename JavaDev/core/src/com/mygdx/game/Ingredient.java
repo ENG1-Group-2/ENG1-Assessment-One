@@ -8,7 +8,7 @@ public class Ingredient {
     public Ingredient(String name, Boolean chopped, Boolean cooked){
         this.name = name;
         this.chopped = chopped;
-        this.cooked = true;
+        this.cooked = cooked;
     }
     public String getName(){
         return name;
