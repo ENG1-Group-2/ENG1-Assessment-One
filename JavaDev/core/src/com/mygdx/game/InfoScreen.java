@@ -56,8 +56,10 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
         for (int i=0; i < ingredients.size(); i++){
             ingredientList += "\n" + ingredients.get(i).getName();
         }
-        orderList += "\n" + Gdx.graphics.getWidth() + "\n" + Gdx.graphics.getHeight();
-        font.getData().setScale(Math.round(Gdx.graphics.getHeight() / 250), Math.round(Gdx.graphics.getHeight() / 250));
+        /*TODO: Change scale of the text so it all fits on screen regardless of resolution
+                maybe split ingredient list into two columns
+         */
+        font.getData().setScale(Math.round(Gdx.graphics.getHeight() / 300), Math.round(Gdx.graphics.getHeight() / 300));
         font.draw(batch, orderList, Math.round(Gdx.graphics.getWidth() * 0.1), Math.round(Gdx.graphics.getHeight() * 0.9));
         font.draw(batch, ingredientList, Math.round(Gdx.graphics.getWidth() * 0.6), Math.round(Gdx.graphics.getHeight() * 0.9));
         batch.end();

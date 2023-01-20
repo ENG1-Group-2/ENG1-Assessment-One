@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -21,6 +22,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.sun.org.apache.xpath.internal.operations.Bool;
+import org.w3c.dom.css.Rect;
 
 import java.util.*;
 
@@ -254,7 +256,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	}
 	public Rectangle scaleObject(Rectangle object, int mapWidth, int mapHeight) {
 		object.setX(Math.round((object.getX() / mapWidth) * screenWidth));
-		object.setY(Math.round(((mapHeight - object.getY()) / mapHeight) * screenHeight));
+		object.setY(Math.round(((mapHeight - object.getY() - object.getHeight()) / mapHeight) * screenHeight));
 		object.setWidth(Math.round((object.getWidth() / mapWidth) * screenWidth));
 		object.setHeight(Math.round((object.getHeight() / mapHeight) * screenHeight));
 		return object;
@@ -301,7 +303,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	@Override
 	public void render(float delta) {
-		System.out.println(customerCounter);
      	// Set black background and clear screen
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -318,7 +319,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		if (chefMove) {
 			characterMovement(keyCode);
 		}
-
 		//Images needs to be render based upon changes.
 		batch.begin();
 		batch.draw(chefImage, chefOne.x, chefOne.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
@@ -364,6 +364,29 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 		BitmapFont font = new BitmapFont();
 		font.draw(batch, displayGrillInfomation(), 10, 10);
+
+
+		/* Displays the corners of the hitboxes for each station. Use to help when adding/adjusting in Tiled
+		int tempInt = 0;
+		List<Rectangle> hitboxes = Arrays.asList(ingredientsForSalad, chiller, choppingStation, grill, assemblyStation);
+		for (Rectangle box: hitboxes){
+			if (tempInt == 0){
+				font.setColor(Color.RED);
+			} else if (tempInt == 1){
+				font.setColor(Color.BLUE);
+			} else if (tempInt == 2){
+				font.setColor(Color.GREEN);
+			} else if (tempInt == 3){
+				font.setColor(Color.PURPLE);
+			}else if (tempInt == 4){
+				font.setColor(Color.PINK);
+			}
+			tempInt += 1;
+			font.draw(batch, "x", box.getX(), screenHeight - (box.getY()));
+			font.draw(batch, "x", box.getX() + box.getWidth(), screenHeight - (box.getY()));
+			font.draw(batch, "x", box.getX(), screenHeight - (box.getY() + box.getHeight()));
+			font.draw(batch, "x", box.getX() + box.getWidth(), screenHeight - (box.getY() + box.getHeight()));
+		}*/
 
 		batch.end();
 	}
@@ -511,30 +534,35 @@ public class Map extends ScreenAdapter implements InputProcessor{
             if (timerStations(ingredientsForSaladTime)) {
                 addSaladIngredients();
                 ingredientsForSaladTime = System.currentTimeMillis();
+				//System.out.println(("Salad"));
             }
 		}
 		if (rectangleDetection(choppingStation, lastClick.getX(), lastClick.getY())){
             if (timerStations(choppingStationTime)) {
                 chopIngredients();
                 choppingStationTime = System.currentTimeMillis();
+				//System.out.println(("Chop"));
             }
 		}
 		if (rectangleDetection(assemblyStation, lastClick.getX(), lastClick.getY())){
             if (timerStations(assemblyStationTime)) {
                 assembly();
                 assemblyStationTime = System.currentTimeMillis();
+				//System.out.println(("Assembly"));
             }
 		}
 		if (rectangleDetection(chiller, lastClick.getX(), lastClick.getY())){
             if (timerStations(chillerTime)) {
                 getChillerItems();
                 chillerTime = System.currentTimeMillis();
+				//System.out.println(("Chiller"));
             }
 		}
 		if (rectangleDetection(grill, lastClick.getX(), lastClick.getY())){
             if (timerStations(grillTime)) {
                 chooseGrillItems();
                 grillTime = System.currentTimeMillis();
+				//System.out.println(("Grill"));
             }
 		}
 	}
@@ -680,7 +708,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 	public void chooseGrillItems(){
 		for (Ingredient rawItem: pantryInventory) {
-			//TODO: Remove once added!
 			if (rawItem instanceof HotIngredient && ((HotIngredient) rawItem).hasCookStarted() == false){
 				switch (rawItem.getName()) {
 					case "Bun":

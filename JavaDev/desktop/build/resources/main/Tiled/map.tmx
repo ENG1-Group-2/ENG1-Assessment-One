@@ -6,11 +6,11 @@
  <tileset firstgid="192" source="new Assets Kitchen.tsx"/>
  <tileset firstgid="283" source="kitchen_edit.tsx"/>
  <objectgroup id="6" name="Starting Point">
-  <object id="101" name="IngredientsForSalad" x="82.6667" y="105.333" width="85.3333" height="126.667"/>
-  <object id="102" name="ChoppingStation" x="373.333" y="93.3333" width="106.667" height="128"/>
-  <object id="103" name="Assembly" x="809.333" y="273.333" width="122.667" height="140"/>
-  <object id="104" name="Chiller" x="34.6667" y="316" width="125.333" height="154.667"/>
-  <object id="105" name="Grill" x="576" y="128" width="121.333" height="149.333"/>
+  <object id="101" name="IngredientsForSalad" x="64.6667" y="105.333" width="112.333" height="119.667"/>
+  <object id="102" name="ChoppingStation" x="373.333" y="93.3333" width="106.667" height="129"/>
+  <object id="103" name="Assembly" x="706.333" y="321.333" width="225.667" height="92"/>
+  <object id="104" name="Chiller" x="34.6667" y="316" width="126.333" height="160.667"/>
+  <object id="105" name="Grill" x="563" y="128" width="121.333" height="93.333"/>
  </objectgroup>
  <layer id="1" name="Base Map" width="30" height="20">
   <data encoding="csv">
