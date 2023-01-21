@@ -1,15 +1,15 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
@@ -20,11 +20,11 @@ import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import org.w3c.dom.css.Rect;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Random;
 
 /**
  * Main game screen which enables the user to control the map.
@@ -49,6 +49,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	Texture chefImage;
 	Texture customerOneImage;
 	Texture customerTwoImage;
+    Texture staffImage;
 	SpriteBatch batch;
 	//Keep track on what object was clicked last to help with movement.
 	Rectangle lastClick;
@@ -84,6 +85,9 @@ public class Map extends ScreenAdapter implements InputProcessor{
     Music menuMusic;
     Sound grillSound;
     Iterator<Ingredient> iterator;
+    Boolean choppingStaff = false;
+    Long lastChop = 0L;
+    int choppingCounter = 0;
     Long ingredientsForSaladTime = 0L;
     Long choppingStationTime = 0L;
     Long assemblyStationTime = 0L;
@@ -93,9 +97,9 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
     public Map(final PiazzaPanicGame game) {
 		this.game = game;
-		pantryInventory = new ArrayList<Ingredient>();
-		orders = new ArrayList<Recipe>();
-        shoppingList = new ArrayList<Ingredient>();
+		pantryInventory = new ArrayList<>();
+		orders = new ArrayList<>();
+        shoppingList = new ArrayList<>();
 	}
 
 	public Map(final PiazzaPanicGame game, ArrayList<Ingredient> pantryInventoryPrev, ArrayList<Recipe> ordersPrev, int customerCounter, ArrayList<Ingredient> shoppingListPrev, Music menuMusic){
@@ -133,7 +137,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	@Override
 	public void show() {
-		if (menuMusic == null || menuMusic.isPlaying() == false) {
+		if (menuMusic == null || !menuMusic.isPlaying()) {
 			menuMusic = Gdx.audio.newMusic(Gdx.files.internal("background.wav"));
 			menuMusic.setLooping(true);
 			menuMusic.play();
@@ -143,6 +147,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		tiledMap = new TmxMapLoader().load("Tiled/map.tmx");
 		customerOneImage = new Texture(Gdx.files.internal("person001.png"));
 		customerTwoImage = new Texture(Gdx.files.internal("person002.png"));
+        staffImage = new Texture(Gdx.files.internal("chef2.png"));
 
 		//Gets all properties from imported tiled map.
 		MapProperties properties = tiledMap.getProperties();
@@ -224,7 +229,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	public String displayGrillInfomation(){
 		String temp = "";
 		if (grillOneObject != null){
-			Long timeDifference = (long) (System.currentTimeMillis() - grillOneObject.getCookingStartTime());
+			long timeDifference = System.currentTimeMillis() - grillOneObject.getCookingStartTime();
 			timeDifference = (timeDifference/1000) % 60;
 			temp += "Grill One Timer:" + timeDifference;
 			if (timeDifference >= grillOneObject.getCookingTime() &&
@@ -234,7 +239,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			}
 		}
 		if (grillTwoObject != null){
-			Long timeDifference = (long) (System.currentTimeMillis() - grillTwoObject.getCookingStartTime());
+			long timeDifference = System.currentTimeMillis() - grillTwoObject.getCookingStartTime();
 			timeDifference = (timeDifference/1000) % 60;
 			temp += "Grill Two Timer:" + timeDifference;
 			if (timeDifference >= grillTwoObject.getCookingTime() &&
@@ -274,10 +279,12 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		//tunaJacketPotato = new Recipe("Tuna Jacket Potato", 2);
 		//recipes.add(tunaJacketPotato);
 
-		beefBurger = new Recipe("Beef Burger", new ArrayList<Ingredient>(Arrays.asList(breadBuns.copy(), burgerPatty.copy(), lettuce.copy())));
+		beefBurger = new Recipe("Beef Burger",
+                new ArrayList<>(Arrays.asList(breadBuns.copy(), burgerPatty.copy(), lettuce.copy())));
 		recipes.add(beefBurger);
 
-		chickenSalad = new Recipe("Chicken Salad", new ArrayList<Ingredient>(Arrays.asList(saladDressing.copy(), cookedChicken.copy(), lettuce.copy(), pepper.copy())));
+		chickenSalad = new Recipe("Chicken Salad",
+                new ArrayList<>(Arrays.asList(saladDressing.copy(), cookedChicken.copy(), lettuce.copy(), pepper.copy())));
 		recipes.add(chickenSalad);
 	}
 
@@ -323,6 +330,28 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		batch.begin();
 		batch.draw(chefImage, chefOne.x, chefOne.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
 		batch.draw(chefImage, chefTwo.x, chefTwo.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
+
+        if (choppingStaff){
+            if (choppingCounter < pantryInventory.size() - 1){
+                // TODO: Make chef appear at the right place.
+                batch.draw(staffImage, grill.x, grill.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
+                if (choppingCounter == 0 && pantryInventory.get(choppingCounter).chopped == false){
+                    lastChop = System.currentTimeMillis();
+                }
+                if (pantryInventory.get(choppingCounter).chopped){
+                    choppingCounter += 1;
+                }
+                if (System.currentTimeMillis() - lastChop > 5000){
+                    pantryInventory.get(choppingCounter).chopIngredient();
+                    System.out.println(pantryInventory.get(choppingCounter).getName());
+                    lastChop = System.currentTimeMillis();
+                }
+            }
+            else{
+                choppingStaff = false;
+            }
+
+        }
 
 		if (customerCounter != 0) {
 				//If it has been 20 seconds since a customer appeared.
@@ -400,9 +429,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		Recipe newOrder = recipes.get(index).copy();
 		orders.add(newOrder);
 
-		for (Ingredient ingredients: newOrder.getIngredients()){
-			shoppingList.add(ingredients);
-		}
+        shoppingList.addAll(newOrder.getIngredients());
 	}
 
 	/**
@@ -441,14 +468,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		}
 	}
 
-	/**
-	 * Moves the previously clicked sprite to the position
-	 * clicked on now.
-	 *
-	 * @param x X position of the area that has been clicked.
-	 * @param y Y position of the area that has been clicked.
-	 */
-/*	private void onClickMove(int x, int y){
+	/*	private void onClickMove(int x, int y){
 		lastClick.x = x;
 		lastClick.y = Gdx.graphics.getHeight() - y;
 		lastClickObject = false;
@@ -559,13 +579,12 @@ public class Map extends ScreenAdapter implements InputProcessor{
             }
 		}
 		if (rectangleDetection(grill, lastClick.getX(), lastClick.getY())){
-            if (timerStations(grillTime)) {
                 chooseGrillItems();
                 grillTime = System.currentTimeMillis();
 				//System.out.println(("Grill"));
             }
 		}
-	}
+
 
     public Boolean timerStations(Long timePara){
        if (timePara == 0 || System.currentTimeMillis() - timePara > 15000){
@@ -687,9 +706,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 	public void chopIngredients(){
 		// TODO: Timing mechanism + staff.
-		for (Ingredient ingredient: pantryInventory){
+		/**for (Ingredient ingredient: pantryInventory){
 			ingredient.chopIngredient();
-		}
+		}*/
+        choppingStaff = true;
 		// TODO: Digital Message!
 		System.out.println("INGREDIENTS CHOPPED!");
 	}
