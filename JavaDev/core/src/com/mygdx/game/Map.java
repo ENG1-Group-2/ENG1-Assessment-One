@@ -93,7 +93,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
     Long assemblyStationTime = 0L;
     Long chillerTime = 0L;
     Long grillTime = 0L;
-
+    Rectangle staffAppearChop;
 
     public Map(final PiazzaPanicGame game) {
 		this.game = game;
@@ -121,9 +121,9 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	public Rectangle loadRectangle(String objectName, int objectLayer) {
 		// Get properties for ingredients stations rectangle stored in the tiled map.
 		MapObjects objects = tiledMap.getLayers().get(objectLayer).getObjects();
-		MapObject grillObject = objects.get(objectName);
-		if (grillObject instanceof RectangleMapObject) {
-			RectangleMapObject grillRectangle = (RectangleMapObject) grillObject;
+		MapObject object = objects.get(objectName);
+		if (object instanceof RectangleMapObject) {
+			RectangleMapObject grillRectangle = (RectangleMapObject) object;
 			return scaleObject(grillRectangle.getRectangle(), tileSize * mapWidth, tileSize * mapHeight);
 		} else {
 			throw new IllegalArgumentException("This object does not exist in the object layer");
@@ -334,7 +334,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
         if (choppingStaff){
             if (choppingCounter < pantryInventory.size() - 1){
                 // TODO: Make chef appear at the right place.
-                batch.draw(staffImage, grill.x, grill.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
+                batch.draw(staffImage, 275, 350, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
                 if (choppingCounter == 0 && pantryInventory.get(choppingCounter).chopped == false){
                     lastChop = System.currentTimeMillis();
                 }
