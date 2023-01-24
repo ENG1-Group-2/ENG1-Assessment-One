@@ -95,6 +95,11 @@ public class Map extends ScreenAdapter implements InputProcessor{
     Long grillTime = 0L;
     Rectangle staffAppearChop;
 
+	/**
+	 * Creates new game map
+	 *
+	 * @param game instance of the game
+	 */
     public Map(final PiazzaPanicGame game) {
 		this.game = game;
 		pantryInventory = new ArrayList<>();
@@ -102,6 +107,17 @@ public class Map extends ScreenAdapter implements InputProcessor{
         shoppingList = new ArrayList<>();
 	}
 
+	/**
+	 * Creates game map
+	 * Uses variables saved from previous map instance
+	 *
+	 * @param game instance of game
+	 * @param pantryInventoryPrev list of ingredients in inventory
+	 * @param ordersPrev list of active orders
+	 * @param customerCounter number of customers left to arrive
+	 * @param shoppingListPrev list of needed ingredients
+	 * @param menuMusic background music being played
+	 */
 	public Map(final PiazzaPanicGame game, ArrayList<Ingredient> pantryInventoryPrev, ArrayList<Recipe> ordersPrev, int customerCounter, ArrayList<Ingredient> shoppingListPrev, Music menuMusic){
 			this.game = game;
 			this.pantryInventory = pantryInventoryPrev;
@@ -226,6 +242,12 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		grillTwoObject = null;
 	}
 
+	/**
+	 * Calculates the time any items on the grills have been cooking and produces display string
+	 *
+	 * @return Text including timer for the two grills
+	 */
+
 	public String displayGrillInfomation(){
 		String temp = "";
 		if (grillOneObject != null){
@@ -251,14 +273,26 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		return temp;
 	}
 
+	/**
+	 * Creates a base instance of every ingredient being used
+	 */
 	public void createIngredients(){
-		lettuce = new Ingredient("Lettuce", false, false);
-		pepper = new Ingredient("Peppers", false, false);
-		cookedChicken = new Ingredient("Chicken", true, false);
-		saladDressing = new Ingredient("SaladDressing", true, false);
+		lettuce = new Ingredient("Lettuce", false, true);
+		pepper = new Ingredient("Peppers", false, true);
+		cookedChicken = new Ingredient("Chicken", true, true);
+		saladDressing = new Ingredient("SaladDressing", true, true);
 		burgerPatty = new HotIngredient("BurgerPatty", true, 45);
 		breadBuns = new HotIngredient("Bun", true, 15);
 	}
+
+	/**
+	 * Adjusts the (X,Y) coordinates, and dimensions of a Rectangle object
+	 *
+	 * @param object Rectangle object in need of scaling
+	 * @param mapWidth number of pixels wide the Tiled map is
+	 * @param mapHeight number of pixels tall the Tiled map is
+	 * @return
+	 */
 	public Rectangle scaleObject(Rectangle object, int mapWidth, int mapHeight) {
 		object.setX(Math.round((object.getX() / mapWidth) * screenWidth));
 		object.setY(Math.round(((mapHeight - object.getY() - object.getHeight()) / mapHeight) * screenHeight));
@@ -267,6 +301,9 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		return object;
 	}
 
+	/**
+	 * Creates a base instance of every recipe being used
+	 */
 	private void createRecipes() {
 		// Store all recipes in an array list to randomly choose an index.
 		recipes = new ArrayList<>(4);
@@ -288,6 +325,9 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		recipes.add(chickenSalad);
 	}
 
+	/**
+	 * Returns first customer object to original location
+	 */
 	private void resetCustomerOne(){
 		customerOne = new Rectangle();
 		customerOne.x = 25;
@@ -296,6 +336,9 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		customerOne.height = 100;
 	}
 
+	/**
+	 * Returns second customer object to original location
+	 */
 	private void resetCustomerTwo(){
 		customerTwo = new Rectangle();
 		customerTwo.x = 600;
@@ -305,8 +348,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	}
 
 	/**
-	 * Constantly renders frame as this screen is ran
-	 * by rendering camera and sprites.
+	 * Runs every frame (1/60th of a second) to draw images to screen
+	 * Calls any functions that need constant checks
 	 */
 	@Override
 	public void render(float delta) {
@@ -420,6 +463,9 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		batch.end();
 	}
 
+	/**
+	 * Randomly chooses a recipe and adds it to the order list
+	 */
 	private void randomOrderGeneration() {
 		// Keep track of how many customers have appeared.
 		customerCounter -= 1;
@@ -498,6 +544,14 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		chefImage.dispose();
 	}
 
+	/**
+	 * Detects key press
+	 * If H pressed display info screen
+	 * If a chef is selected, enable movement of the chef
+	 *
+	 * @param keycode one of the constants in {@link Input.Keys}
+	 * @return true
+	 */
 	@Override
 	public boolean keyDown(int keycode) {
 		if (keycode == Input.Keys.H){
@@ -509,9 +563,15 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			chefMove = true;
 			keyCode = keycode;
 		}
-			return true;
+		return true;
 	}
 
+	/**
+	 * If WASD key is lifted, disable chef movement
+	 *
+	 * @param keycode one of the constants in {@link Input.Keys}
+	 * @return false
+	 */
 	@Override
 	public boolean keyUp(int keycode) {
 		if ((keycode == 51) || (keycode == 29) || (keycode == 47) || (keycode == 32)) {
@@ -520,20 +580,30 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		return false;
 	}
 
+	/**
+	 * Moves chef based on WASD input
+	 * Checks for collision of chef with work station objects
+	 *
+	 * @param keycode ID of key being pressed
+	 */
 	private void characterMovement(int keycode) {
 		int pixelPerFrame = Math.round((Gdx.graphics.getWidth() / 3) * Gdx.graphics.getDeltaTime());
-		if (keycode == 51){
+		if (keycode == 51) {
 			lastClick.y += pixelPerFrame;
-		}
-		else if (keycode == 29){
+		} else if (keycode == 29) {
 			lastClick.x -= pixelPerFrame;
-		}
-		else if (keycode == 47){
+		} else if (keycode == 47) {
 			lastClick.y -= pixelPerFrame;
-		}
-		else if (keycode == 32){
+		} else if (keycode == 32) {
 			lastClick.x += pixelPerFrame;
 		}
+		detectCollision();
+	}
+
+	/**
+	 * Detects any collisions between selected chef and work stations
+	 */
+	private void detectCollision(){
 		/** if (lastClick.overlaps(ingredientsStation)){
 			if (pantryInventory == null){
 				game.setScreen(new PantrySelection(game, new ArrayList<Ingredient>(), orders));
@@ -585,7 +655,12 @@ public class Map extends ScreenAdapter implements InputProcessor{
             }
 		}
 
-
+	/**
+	 * Checks if last interaction with station was at least 15 seconds ago
+	 *
+	 * @param timePara time of last interaction with station
+	 * @return truth value of time check
+	 */
     public Boolean timerStations(Long timePara){
        if (timePara == 0 || System.currentTimeMillis() - timePara > 15000){
            return true;
@@ -595,16 +670,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
         }
     }
 
+	/**
+	 * Checks order list and adds needed chiller ingredients to inventory
+	 */
 	public void getChillerItems(){
-		/**for (Ingredient newItem: shoppingList){
-			//TODO: Remove once added!
-			switch (newItem.getName()){
-				case "Bun":
-					pantryInventory.add(newItem);
-				case "BurgerPatty":
-					pantryInventory.add(newItem);
-			}
-		}*/
         if (shoppingList.isEmpty()){
             return;
         }
@@ -648,7 +717,9 @@ public class Map extends ScreenAdapter implements InputProcessor{
         }
     }*/
 
-
+	/**
+	 * Checks order list and adds needed salad station ingredients to inventory
+	 */
 	public void addSaladIngredients(){
         /*
 		Set<Ingredient> setCopy = new HashSet<>(shoppingList);
@@ -704,20 +775,27 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		System.out.println("Ingredients Collected SALAD");
 	}
 
+	/**
+	 * Chops any ingredients that can be chopped
+	 */
 	public void chopIngredients(){
 		// TODO: Timing mechanism + staff.
-		/**for (Ingredient ingredient: pantryInventory){
+		for (Ingredient ingredient: pantryInventory){
 			ingredient.chopIngredient();
-		}*/
+		}
         choppingStaff = true;
 		// TODO: Digital Message!
 		System.out.println("INGREDIENTS CHOPPED!");
 	}
 
+	/**
+	 * Checks held ingredients and assembles complete orders
+	 */
 	public void assembly() {
 		for (Recipe order : orders) {
 			order.verifyCompletion();
 			if (order.assembled == true) {
+				removeIngredients(order);
                 Sound assemblySound = Gdx.audio.newSound(Gdx.files.internal("assembly station sound.wav"));
                 assemblySound.play();
 				System.out.println("COMPLETED AN ORDER");
@@ -726,6 +804,41 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		}
 	}
 
+	/**
+	 * Removes all used ingredients from inventory
+	 * @param order order being assembled
+	 */
+	public void removeIngredients(Recipe order) {
+		for (Ingredient ingredient: order.getIngredients()) {
+			if (pantryInventory.isEmpty()){
+				return;
+			}
+			switch (ingredient.getName()) {
+				case "SaladDressing":
+					pantryInventory.remove(ingredient);
+					break;
+				case "Chicken":
+					pantryInventory.remove(ingredient);
+					break;
+				case "Lettuce":
+					pantryInventory.remove(ingredient);
+					break;
+				case "Peppers":
+					pantryInventory.remove(ingredient);
+					break;
+				case "Bun":
+					pantryInventory.remove(ingredient);
+					break;
+				case "BurgerPatty":
+					pantryInventory.remove(ingredient);
+					break;
+			}
+		}
+	}
+
+	/**
+	 * Checks inventory and adds ingredients that need cooking to the grill
+	 */
 	public void chooseGrillItems(){
 		for (Ingredient rawItem: pantryInventory) {
 			if (rawItem instanceof HotIngredient && ((HotIngredient) rawItem).hasCookStarted() == false){
@@ -743,6 +856,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		}
 	}
 
+	/**
+	 * Begins cooking an ingredient
+	 * @param toCook ingredient to cook
+	 */
 	public void grillItem(Ingredient toCook){
 		if (grillOneObject == null){
 			grillOneObject = toCook;
@@ -758,6 +875,16 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	public boolean keyTyped(char character) {
 		return false;
 	}
+
+	/**
+	 * When mouse is clicked, gets coordinates and checks for any click events
+	 *
+	 * @param screenX The x coordinate, origin is in the upper left corner
+	 * @param screenY The y coordinate, origin is in the upper left corner
+	 * @param pointer the pointer for the event.
+	 * @param button the button
+	 * @return false
+	 */
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		clickEvent(screenX, screenY);

@@ -11,6 +11,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.ArrayList;
 
+/**
+ * Screen that displays key information
+ * Includes list of current orders and ingredients being held
+ */
 public class InfoScreen extends ScreenAdapter implements InputProcessor {
     final PiazzaPanicGame game;
     ArrayList<Ingredient> ingredients;
@@ -21,6 +25,17 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
     SpriteBatch batch = new SpriteBatch();
     int customerCounter;
 
+    /**
+     * Gets and assigns variables needed for information screen
+     * Also gets variables needing to be saved for Map instantiation
+     *
+     * @param game instance of game
+     * @param orders list of active orders
+     * @param ingredients list of ingredients in inventory
+     * @param customerCounter number of customers left to arrive
+     * @param shoppingList list of needed ingredients
+     * @param menuMusic background music being played
+     */
     public InfoScreen(final PiazzaPanicGame game, ArrayList<Recipe> orders, ArrayList<Ingredient> ingredients, int customerCounter, ArrayList<Ingredient> shoppingList, Music menuMusic){
         this.game = game;
         this.orders = orders;
@@ -31,11 +46,18 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
 
     }
 
+    /**
+     * Creates initial information page
+     */
     @Override
     public void show(){
         Gdx.input.setInputProcessor(this);
     }
 
+    /**
+     * Runs every frame to draw information to the screen
+     * @param delta The time in seconds since the last render.
+     */
     @Override
     public void render(float delta){
         // Set black background anc clear screen
@@ -54,7 +76,7 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
         ingredientList = "Ingredients";
 
         for (int i=0; i < ingredients.size(); i++){
-            ingredientList += "\n" + ingredients.get(i).getName();
+            ingredientList += "\n" + ingredients.get(i).getName() + " " + ingredients.get(i).getCooked() + " " + ingredients.get(i).getChopped();
         }
         /*TODO: Change scale of the text so it all fits on screen regardless of resolution
                 maybe split ingredient list into two columns
@@ -72,6 +94,12 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
         return false;
     }
 
+    /**
+     * Checks if key is pressed, if escape is pressed return to Map screen
+     *
+     * @param keycode one of the constants in {@link Input.Keys}
+     * @return
+     */
     @Override
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.ESCAPE){
