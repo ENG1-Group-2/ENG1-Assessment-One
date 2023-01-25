@@ -4,6 +4,7 @@ public class Ingredient {
     public String name;
     public Boolean chopped;
     public Boolean cooked;
+    public Boolean flipped;
 
     /**
      * Creates new instance of an ingredient
@@ -12,10 +13,11 @@ public class Ingredient {
      * @param chopped is ingredient already chopped
      * @param cooked time taken to cook ingredient
      */
-    public Ingredient(String name, Boolean chopped, Boolean cooked){
+    public Ingredient(String name, Boolean chopped, Boolean cooked, Boolean flipped){
         this.name = name;
         this.chopped = chopped;
         this.cooked = cooked;
+        this.flipped = flipped;
     }
 
     /**
@@ -52,13 +54,18 @@ public class Ingredient {
         }
     }
 
+    public void flip(){
+        if (flipped == false){
+            flipped = true;
+        }
+    }
     /**
      * Creates copy of an ingredient
      *
      * @return new instance of ingredient
      */
     public Ingredient copy(){
-        return new Ingredient(name, chopped, cooked);
+        return new Ingredient(name, chopped, cooked, flipped);
     }
 
     /**
@@ -70,6 +77,7 @@ public class Ingredient {
         return false;
     }
 
+    public boolean getFlipped(){return flipped;}
     /**
      * Gets cooked value of ingredient
      *

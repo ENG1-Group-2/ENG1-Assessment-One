@@ -26,14 +26,16 @@ public class Recipe {
      */
     public Boolean verifyCompletion(){
         for (Ingredient ingredient: ingredients){
-            if (ingredient.getChopped() == false || ingredient.getCooked() == false){
-                assembled = false;
-                return false;
+            if (ingredient.getChopped() || ingredient.getCooked() ||
+            ingredient.getFlipped()){
+                assembled = true;
+                return true;
             }
         }
-        assembled = true;
-        return true;
+        assembled = false;
+        return false;
     }
+
 
     /**
      * Gets the name of the recipe

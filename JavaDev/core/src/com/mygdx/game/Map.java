@@ -1,9 +1,6 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
@@ -93,7 +90,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
     Long assemblyStationTime = 0L;
     Long chillerTime = 0L;
     Long grillTime = 0L;
-    Rectangle staffAppearChop;
+    Grill burgerGrill;
+    Rectangle hob1;
+    Rectangle hob2;
+    Texture burgerCookImage;
 
 	/**
 	 * Creates new game map
@@ -105,6 +105,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		pantryInventory = new ArrayList<>();
 		orders = new ArrayList<>();
         shoppingList = new ArrayList<>();
+        burgerGrill = new Grill(grill, 2);
 	}
 
 	/**
@@ -118,13 +119,15 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 * @param shoppingListPrev list of needed ingredients
 	 * @param menuMusic background music being played
 	 */
-	public Map(final PiazzaPanicGame game, ArrayList<Ingredient> pantryInventoryPrev, ArrayList<Recipe> ordersPrev, int customerCounter, ArrayList<Ingredient> shoppingListPrev, Music menuMusic){
+	public Map(final PiazzaPanicGame game, ArrayList<Ingredient> pantryInventoryPrev, ArrayList<Recipe> ordersPrev, int customerCounter, ArrayList<Ingredient> shoppingListPrev, Music menuMusic, Grill grill){
 			this.game = game;
 			this.pantryInventory = pantryInventoryPrev;
             this.orders = ordersPrev;
 			this.customerCounter = customerCounter;
             this.shoppingList = shoppingListPrev;
 			this.menuMusic = menuMusic;
+            this.burgerGrill = grill;
+
 	}
 
 	/**
@@ -153,6 +156,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	@Override
 	public void show() {
+        hob1 = new Rectangle(375, 200, 10,10 );
+
 		if (menuMusic == null || !menuMusic.isPlaying()) {
 			menuMusic = Gdx.audio.newMusic(Gdx.files.internal("background.wav"));
 			menuMusic.setLooping(true);
@@ -164,6 +169,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		customerOneImage = new Texture(Gdx.files.internal("person001.png"));
 		customerTwoImage = new Texture(Gdx.files.internal("person002.png"));
         staffImage = new Texture(Gdx.files.internal("chef2.png"));
+        burgerCookImage = new Texture(Gdx.files.internal("raw_burger.png"));
 
 		//Gets all properties from imported tiled map.
 		MapProperties properties = tiledMap.getProperties();
@@ -217,6 +223,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		chiller = loadRectangle("Chiller", 0);
 		grill = loadRectangle("Grill", 0);
 
+
 		createIngredients();
 
 		// Keep list of sprites to make checking clicks easier.
@@ -236,10 +243,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 		// Creating pantry and recipes using class defined in package.
 		createRecipes();
-
-		// Usage of both grills.
-		grillOneObject = null;
-		grillTwoObject = null;
 	}
 
 	/**
@@ -277,12 +280,12 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 * Creates a base instance of every ingredient being used
 	 */
 	public void createIngredients(){
-		lettuce = new Ingredient("Lettuce", false, true);
-		pepper = new Ingredient("Peppers", false, true);
-		cookedChicken = new Ingredient("Chicken", true, true);
-		saladDressing = new Ingredient("SaladDressing", true, true);
-		burgerPatty = new HotIngredient("BurgerPatty", true, 45);
-		breadBuns = new HotIngredient("Bun", true, 15);
+		lettuce = new Ingredient("Lettuce", false, true, true);
+		pepper = new Ingredient("Peppers", false, true, true);
+		cookedChicken = new Ingredient("Chicken", true, true, true);
+		saladDressing = new Ingredient("SaladDressing", true, true, true);
+		burgerPatty = new HotIngredient("BurgerPatty", true, 45, false);
+		breadBuns = new HotIngredient("Bun", true, 15, true);
 	}
 
 	/**
@@ -353,6 +356,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	@Override
 	public void render(float delta) {
+
      	// Set black background and clear screen
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -373,6 +377,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		batch.begin();
 		batch.draw(chefImage, chefOne.x, chefOne.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
 		batch.draw(chefImage, chefTwo.x, chefTwo.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
+        batch.draw(burgerCookImage, hob1.x, hob1.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
 
         if (choppingStaff){
             if (choppingCounter < pantryInventory.size() - 1){
@@ -435,7 +440,13 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		}
 
 		BitmapFont font = new BitmapFont();
-		font.draw(batch, displayGrillInfomation(), 10, 10);
+        String grillInfo = burgerGrill.displayGrillInfo();
+		font.draw(batch, grillInfo, 10, 10);
+        if (rectangleDetection(grill, chefOne.getX(), chefOne.getY()) ||
+                rectangleDetection(grill, chefTwo.getX(), chefTwo.getY())){
+            burgerGrill.hasGrillEnded();
+        }
+
 
 
 		/* Displays the corners of the hitboxes for each station. Use to help when adding/adjusting in Tiled
@@ -491,8 +502,15 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		} else {
 			onClickObject(x, y);
 		}*/
-		if (rectangleDetection(grill, x, y)){
-			System.out.println("SUCCESSFULL CLICK");
+		if (rectangleDetection(grill, x, Gdx.graphics.getHeight() - y) &&
+                ((rectangleDetection(grill, chefOne.getX(), chefOne.getY())) ||
+                (rectangleDetection(grill, chefTwo.getX(), chefTwo.getY())))){
+			if (grillOneObject != null && grillOneObject.getFlipped() == false){
+                grillOneObject.flip();
+            }
+            if (grillTwoObject != null && grillTwoObject.getFlipped() == false){
+                grillOneObject.flip();
+            }
 		}
 		onClickObject(x, y);
 	}
@@ -555,7 +573,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	@Override
 	public boolean keyDown(int keycode) {
 		if (keycode == Input.Keys.H){
-			game.setScreen(new InfoScreen(game, orders, pantryInventory, customerCounter, shoppingList, menuMusic));
+			game.setScreen(new InfoScreen(game, orders, pantryInventory, customerCounter, shoppingList, menuMusic, burgerGrill));
 		}
 		if (lastClickObject == true) {
 			/*return false;
@@ -599,7 +617,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	private void characterMovement(int keycode) {
 		int pixelPerFrame = Math.round((Gdx.graphics.getWidth() / 3) * Gdx.graphics.getDeltaTime());
-		if (keycode == 51 && collisionDetection(new Rectangle(lastClick.x, lastClick.y + pixelPerFrame, lastClick.width, lastClick.height))) {
+		if (keycode == 51) {
 			lastClick.y += pixelPerFrame;
 		} else if (keycode == 29) {
 			lastClick.x -= pixelPerFrame;
@@ -855,13 +873,11 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			if (rawItem instanceof HotIngredient && ((HotIngredient) rawItem).hasCookStarted() == false){
 				switch (rawItem.getName()) {
 					case "Bun":
-						grillItem(rawItem);
-                        grillSound = Gdx.audio.newSound(Gdx.files.internal("grill_sound.wav"));
-                        grillSound.play();
+                        burgerGrill.grillItem(rawItem);
+                        break;
 					case "BurgerPatty":
-						grillItem(rawItem);
-                        grillSound = Gdx.audio.newSound(Gdx.files.internal("grill_sound.wav"));
-                        grillSound.play();
+                        burgerGrill.grillItem(rawItem);
+                        break;
 				}
 			}
 		}
@@ -898,7 +914,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		clickEvent(screenX, screenY);
+        clickEvent(screenX, screenY);
 		return false;
 	}
 

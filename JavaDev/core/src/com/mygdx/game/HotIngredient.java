@@ -15,8 +15,8 @@ public class HotIngredient extends Ingredient {
      * @param chopped is ingredient already chopped
      * @param cookingTime time taken to cook ingredient
      */
-    public HotIngredient(String name, Boolean chopped, long cookingTime) {
-        super(name, chopped, false);
+    public HotIngredient(String name, Boolean chopped, long cookingTime, Boolean flipped) {
+        super(name, chopped, false, flipped);
         this.cookingTime = cookingTime;
         cookingStart = 0;
     }
@@ -90,7 +90,7 @@ public class HotIngredient extends Ingredient {
      * @return new instance of hot ingredient
      */
     public HotIngredient copy(){
-        return new HotIngredient(name, chopped, cookingTime);
+        return new HotIngredient(name, chopped, cookingTime, flipped);
     }
 }
 

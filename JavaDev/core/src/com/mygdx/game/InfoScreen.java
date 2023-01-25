@@ -30,14 +30,16 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
     TiledMap tiledMenu;
     OrthographicCamera camera;
     TiledMapRenderer tiledMenuRenderer;
+    Grill grill;
 
-    public InfoScreen(final PiazzaPanicGame game, ArrayList<Recipe> orders, ArrayList<Ingredient> ingredients, int customerCounter, ArrayList<Ingredient> shoppingList, Music menuMusic){
+    public InfoScreen(final PiazzaPanicGame game, ArrayList<Recipe> orders, ArrayList<Ingredient> ingredients, int customerCounter, ArrayList<Ingredient> shoppingList, Music menuMusic, Grill grill){
         this.game = game;
         this.orders = orders;
         this.ingredients = ingredients;
         this.customerCounter = customerCounter;
         this.shoppingList = shoppingList;
         this.menuMusic = menuMusic;
+        this.grill = grill;
 
     }
 
@@ -101,7 +103,7 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
     @Override
     public boolean keyDown(int keycode) {
         if (keycode == Input.Keys.H){
-            game.setScreen(new Map(game, ingredients, orders, customerCounter, shoppingList, menuMusic));
+            game.setScreen(new Map(game, ingredients, orders, customerCounter, shoppingList, menuMusic, grill));
         }
         return false;
     }
@@ -109,7 +111,7 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
     @Override
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.ESCAPE){
-            game.setScreen(new Map(game, ingredients, orders, customerCounter, shoppingList, menuMusic));
+            game.setScreen(new Map(game, ingredients, orders, customerCounter, shoppingList, menuMusic, grill));
         }
         return false;
     }
