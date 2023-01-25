@@ -1,0 +1,129 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "map.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "!$DOOR_2HIGH5.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Door.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Interiors_free_32x32.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Room_Builder_free_32x32.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Tiled Maps/Tiles.tsx": {
+            "scaleInDock": 1
+        },
+        "Tiled Maps/Tileset_32x32_1.tsx": {
+            "scaleInDock": 1
+        },
+        "Tiled Maps/kitchen.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Tiled Maps/map.tmx": {
+            "scale": 0.455703125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 481.6732384707698,
+                "y": 319.28681638950803
+            }
+        },
+        "Tiles.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Tileset_32x32_1.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "grill.tmx": {
+            "scale": 0.27708333333333335,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 1156.6917293233082,
+                "y": 323.0075187969925
+            }
+        },
+        "infoScreen.tmx": {
+            "scale": 0.3720833333333333,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 861.3661814109743,
+                "y": 321.1646136618141
+            }
+        },
+        "kitchen.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "kitchen_edit.tsx": {
+            "scaleInDock": 1
+        },
+        "map.tmx": {
+            "expandedObjectLayers": [
+                6
+            ],
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 283.5,
+                "y": 201.5
+            }
+        },
+        "new Assets Kitchen.tsx": {
+            "scaleInDock": 1
+        },
+        "pantry.tmx": {
+            "scale": 1,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 721.5,
+                "y": 281.5
+            }
+        },
+        "tileset_food.tsx": {
+            "dynamicWrapping": false
+        }
+    },
+    "last.externalTilesetPath": "/home/kev/Documents/ENG1-Assessment-One",
+    "last.imagePath": "/home/kev/Documents/ENG1-Assessment-One/Tiled",
+    "map.lastUsedFormat": "tmx",
+    "openFiles": [
+        "map.tmx",
+        "Tiles.tsx"
+    ],
+    "project": "cooking-game-map.tiled-project",
+    "recentFiles": [
+        "Tiles.tsx",
+        "map.tmx",
+        "Tiled Maps/map.tmx",
+        "Tiled Maps/kitchen.tsx",
+        "Door.tsx",
+        "kitchen.tsx",
+        "Interiors_free_32x32.tsx",
+        "!$DOOR_2HIGH5.tsx",
+        "Room_Builder_free_32x32.tsx",
+        "Tileset_32x32_1.tsx"
+    ],
+    "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)",
+    "tileset.lastUsedFormat": "tsx"
+}
