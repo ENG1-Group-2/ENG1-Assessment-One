@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="106">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="10" nextobjectid="116">
  <tileset firstgid="1" source="kitchen.tsx"/>
  <tileset firstgid="57" source="Tileset_32x32_1.tsx"/>
  <tileset firstgid="157" source="Tiles.tsx"/>
@@ -11,6 +11,9 @@
   <object id="103" name="Assembly" x="706.333" y="321.333" width="225.667" height="92"/>
   <object id="104" name="Chiller" x="34.6667" y="316" width="126.333" height="160.667"/>
   <object id="105" name="Grill" x="563" y="128" width="121.333" height="93.333"/>
+ </objectgroup>
+ <objectgroup id="9" name="Collision Detection">
+  <object id="107" name="0" x="24" y="15" width="889" height="563"/>
  </objectgroup>
  <layer id="1" name="Base Map" width="30" height="20">
   <data encoding="csv">

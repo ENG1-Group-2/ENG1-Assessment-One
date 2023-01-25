@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -18,10 +19,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Main game screen which enables the user to control the map.
@@ -156,7 +154,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	@Override
 	public void show() {
-        hob1 = new Rectangle(375, 200, 10,10 );
+        hob1 = new Rectangle(380, 420, 5,5 );
+		hob2 = new Rectangle(420, 420, 5,5 );
 
 		if (menuMusic == null || !menuMusic.isPlaying()) {
 			menuMusic = Gdx.audio.newMusic(Gdx.files.internal("background.wav"));
@@ -378,6 +377,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		batch.draw(chefImage, chefOne.x, chefOne.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
 		batch.draw(chefImage, chefTwo.x, chefTwo.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
         batch.draw(burgerCookImage, hob1.x, hob1.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
+		batch.draw(burgerCookImage, hob2.x, hob2.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
+
 
         if (choppingStaff){
             if (choppingCounter < pantryInventory.size() - 1){
@@ -443,15 +444,17 @@ public class Map extends ScreenAdapter implements InputProcessor{
         String grillInfo = burgerGrill.displayGrillInfo();
 		font.draw(batch, grillInfo, 10, 10);
         if (rectangleDetection(grill, chefOne.getX(), chefOne.getY()) ||
-                rectangleDetection(grill, chefTwo.getX(), chefTwo.getY())){
-            burgerGrill.hasGrillEnded();
-        }
+                rectangleDetection(grill, chefTwo.getX(), chefTwo.getY())) {
+			burgerGrill.hasGrillEnded();
+		}
 
-
-
-		/* Displays the corners of the hitboxes for each station. Use to help when adding/adjusting in Tiled
+		ArrayList<Rectangle> hitboxes = new ArrayList<>();
+		for (int i=0; i<8; i++) {
+			hitboxes.add(loadRectangle(Integer.toString(i), 1));
+		}
+		 //Displays the corners of the hitboxes for each station. Use to help when adding/adjusting in Tiled
 		int tempInt = 0;
-		List<Rectangle> hitboxes = Arrays.asList(ingredientsForSalad, chiller, choppingStation, grill, assemblyStation);
+
 		for (Rectangle box: hitboxes){
 			if (tempInt == 0){
 				font.setColor(Color.RED);
@@ -463,13 +466,24 @@ public class Map extends ScreenAdapter implements InputProcessor{
 				font.setColor(Color.PURPLE);
 			}else if (tempInt == 4){
 				font.setColor(Color.PINK);
+			} else if (tempInt == 5){
+				font.setColor(Color.ORANGE);
+			} else if (tempInt == 6){
+				font.setColor(Color.YELLOW);
+			} else if (tempInt == 7){
+				font.setColor(Color.BLACK);
 			}
 			tempInt += 1;
 			font.draw(batch, "x", box.getX(), screenHeight - (box.getY()));
 			font.draw(batch, "x", box.getX() + box.getWidth(), screenHeight - (box.getY()));
 			font.draw(batch, "x", box.getX(), screenHeight - (box.getY() + box.getHeight()));
 			font.draw(batch, "x", box.getX() + box.getWidth(), screenHeight - (box.getY() + box.getHeight()));
-		}*/
+
+			batch.draw(chefImage, box.getX(), screenHeight - box.getY());
+			batch.draw(chefImage, box.getX() + box.getWidth(), screenHeight - (box.getY()));
+			batch.draw(chefImage, box.getX(), screenHeight - (box.getY() + box.getHeight()));
+			batch.draw(chefImage, box.getX() + box.getWidth(), screenHeight - (box.getY() + box.getHeight()));
+		}
 
 		batch.end();
 	}
@@ -502,6 +516,12 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		} else {
 			onClickObject(x, y);
 		}*/
+		for (int i=0; i<8; i++) {
+			if (loadRectangle(Integer.toString(i), 1).contains(x, Gdx.graphics.getHeight() - y)){
+				System.out.println(i);
+			}
+		}
+
 		if (rectangleDetection(grill, x, Gdx.graphics.getHeight() - y) &&
                 ((rectangleDetection(grill, chefOne.getX(), chefOne.getY())) ||
                 (rectangleDetection(grill, chefTwo.getX(), chefTwo.getY())))){
@@ -600,11 +620,13 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
     public Boolean collisionDetection(Rectangle sprite){
         //Layers 0 and 11 as in tiled map.
-        for (int i=0; i<12; i++) {
-            if (loadRectangle(Integer.toString(i), 1).overlaps(sprite)){
+        for (int i=0; i<8; i++) {
+            if (loadRectangle(Integer.toString(i), 1).contains(sprite.getX(), sprite.getY())){
+				System.out.println("collision");
                 return false;
             }
         }
+		System.out.println("none");
         return true;
 
     }
@@ -617,13 +639,13 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	private void characterMovement(int keycode) {
 		int pixelPerFrame = Math.round((Gdx.graphics.getWidth() / 3) * Gdx.graphics.getDeltaTime());
-		if (keycode == 51) {
+		if (keycode == 51 && collisionDetection(new Rectangle(lastClick.x, lastClick.y + pixelPerFrame, lastClick.width, lastClick.height))) {
 			lastClick.y += pixelPerFrame;
-		} else if (keycode == 29) {
+		} else if (keycode == 29 && collisionDetection(new Rectangle(lastClick.x - pixelPerFrame, lastClick.y, lastClick.width, lastClick.height))) {
 			lastClick.x -= pixelPerFrame;
-		} else if (keycode == 47) {
+		} else if (keycode == 47 && collisionDetection(new Rectangle(lastClick.x, lastClick.y - pixelPerFrame, lastClick.width, lastClick.height))) {
 			lastClick.y -= pixelPerFrame;
-		} else if (keycode == 32) {
+		} else if (keycode == 32 && collisionDetection(new Rectangle(lastClick.x + pixelPerFrame, lastClick.y, lastClick.width, lastClick.height))) {
 			lastClick.x += pixelPerFrame;
 		}
 		detectCollision();

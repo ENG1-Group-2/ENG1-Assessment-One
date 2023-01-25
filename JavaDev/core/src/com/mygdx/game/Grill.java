@@ -32,7 +32,7 @@ public class Grill{
                 temp += "Grill One Timer:" + timeDifference;
             }
         }
-        System.out.println(temp);
+        //System.out.println(temp);
         return temp;
     }
 

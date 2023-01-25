@@ -1,13 +1,8 @@
 {
-    "Map/SizeTest": {
-        "height": 4300,
-        "width": 2
-    },
     "activeFile": "map.tmx",
     "expandedProjectPaths": [
         "."
     ],
-    "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "!$DOOR_2HIGH5.tsx": {
             "scaleInDock": 1,
@@ -83,10 +78,10 @@
                 6
             ],
             "scale": 1,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 283.5,
-                "y": 201.5
+                "x": 468.5,
+                "y": 296.5
             }
         },
         "new Assets Kitchen.tsx": {
@@ -104,9 +99,6 @@
             "dynamicWrapping": false
         }
     },
-    "last.externalTilesetPath": "/home/kev/Documents/ENG1-Assessment-One",
-    "last.imagePath": "/home/kev/Documents/ENG1-Assessment-One/Tiled",
-    "map.lastUsedFormat": "tmx",
     "openFiles": [
         "map.tmx",
         "Tiles.tsx"
@@ -115,15 +107,13 @@
     "recentFiles": [
         "Tiles.tsx",
         "map.tmx",
+        "kitchen.tsx",
         "Tiled Maps/map.tmx",
         "Tiled Maps/kitchen.tsx",
         "Door.tsx",
-        "kitchen.tsx",
         "Interiors_free_32x32.tsx",
         "!$DOOR_2HIGH5.tsx",
         "Room_Builder_free_32x32.tsx",
         "Tileset_32x32_1.tsx"
-    ],
-    "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)",
-    "tileset.lastUsedFormat": "tsx"
+    ]
 }
