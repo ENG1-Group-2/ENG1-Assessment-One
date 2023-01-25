@@ -580,6 +580,17 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		return false;
 	}
 
+    public Boolean collisionDetection(Rectangle sprite){
+        //Layers 0 and 11 as in tiled map.
+        for (int i=0; i<12; i++) {
+            if (loadRectangle(Integer.toString(i), 1).overlaps(sprite)){
+                return false;
+            }
+        }
+        return true;
+
+    }
+
 	/**
 	 * Moves chef based on WASD input
 	 * Checks for collision of chef with work station objects
@@ -588,7 +599,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	private void characterMovement(int keycode) {
 		int pixelPerFrame = Math.round((Gdx.graphics.getWidth() / 3) * Gdx.graphics.getDeltaTime());
-		if (keycode == 51) {
+		if (keycode == 51 && collisionDetection(new Rectangle(lastClick.x, lastClick.y + pixelPerFrame, lastClick.width, lastClick.height))) {
 			lastClick.y += pixelPerFrame;
 		} else if (keycode == 29) {
 			lastClick.x -= pixelPerFrame;

@@ -18,6 +18,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import java.util.ArrayList;
 
 public class InfoScreen extends ScreenAdapter implements InputProcessor {
+
     final PiazzaPanicGame game;
     ArrayList<Ingredient> ingredients;
     ArrayList<Recipe> orders;
