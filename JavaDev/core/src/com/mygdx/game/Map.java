@@ -3,7 +3,6 @@ package com.mygdx.game;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -92,6 +91,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
     Rectangle hob2;
     Texture burgerCookImagePost;
     Texture burgerCookImagePre;
+    Long startTime = 0L;
 
 
     /**
@@ -105,6 +105,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		orders = new ArrayList<>();
         shoppingList = new ArrayList<>();
         burgerGrill = new Grill(grill, 2);
+        startTime = System.currentTimeMillis();
 	}
 
 	/**
@@ -118,7 +119,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 * @param shoppingListPrev list of needed ingredients
 	 * @param menuMusic background music being played
 	 */
-	public Map(final PiazzaPanicGame game, ArrayList<Ingredient> pantryInventoryPrev, ArrayList<Recipe> ordersPrev, int customerCounter, ArrayList<Ingredient> shoppingListPrev, Music menuMusic, Grill grill){
+	public Map(final PiazzaPanicGame game, ArrayList<Ingredient> pantryInventoryPrev, ArrayList<Recipe> ordersPrev, int customerCounter, ArrayList<Ingredient> shoppingListPrev, Music menuMusic, Grill grill, Long startTime){
 			this.game = game;
 			this.pantryInventory = pantryInventoryPrev;
             this.orders = ordersPrev;
@@ -126,7 +127,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
             this.shoppingList = shoppingListPrev;
 			this.menuMusic = menuMusic;
             this.burgerGrill = grill;
-
+            this.startTime = startTime;
 	}
 
 	/**
@@ -612,7 +613,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	@Override
 	public boolean keyDown(int keycode) {
 		if (keycode == Input.Keys.H){
-			game.setScreen(new InfoScreen(game, orders, pantryInventory, customerCounter, shoppingList, menuMusic, burgerGrill));
+			game.setScreen(new InfoScreen(game, orders, pantryInventory, customerCounter, shoppingList, menuMusic, burgerGrill, startTime));
 		}
 		if (lastClickObject == true) {
 			/*return false;
@@ -859,9 +860,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	public void chopIngredients(){
 		// TODO: Timing mechanism + staff.
-		for (Ingredient ingredient: pantryInventory){
-			ingredient.chopIngredient();
-		}
         choppingStaff = true;
 		// TODO: Digital Message!
 		System.out.println("INGREDIENTS CHOPPED!");
@@ -871,6 +869,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 * Checks held ingredients and assembles complete orders
 	 */
 	public void assembly() {
+        Boolean allComplete = true;
 		for (Recipe order : orders) {
 			order.verifyCompletion();
 			if (order.assembled == true) {
@@ -880,7 +879,13 @@ public class Map extends ScreenAdapter implements InputProcessor{
 				System.out.println("COMPLETED AN ORDER");
 				//TODO: Display on map.
 			}
+            else{
+                allComplete = false;
+            }
 		}
+        if (allComplete){
+            System.out.println(System.currentTimeMillis() - startTime);
+        }
 	}
 
 	/**
