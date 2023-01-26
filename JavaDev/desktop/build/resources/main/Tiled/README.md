@@ -17,3 +17,5 @@ https://opengameart.org/content/kitchen-assets-for-letscookjam
 https://www.playonloop.com/royalty-free-music/corporate-and-media/
 
 https://paperhatlizard.itch.io/cryos-mini-gui
+
+https://spiderbr0.itch.io/32x-pixel-raw-meat

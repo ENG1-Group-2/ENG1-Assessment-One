@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Rectangle;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.util.ArrayList;
 
@@ -63,5 +64,16 @@ public class Grill{
         }
     }
 
+    public void flipItems() {
+        for (int i = 0; hobs.size() > i; i++) {
+            if (hobs.get(i).getName() != null && hobs.get(i).getFlipped() == false) {
+                hobs.get(i).flip();
 
+            }
+        }
+    }
+
+    public ArrayList<Ingredient> getItems(){
+        return hobs;
+    }
 }

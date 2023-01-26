@@ -28,7 +28,6 @@ import java.util.*;
  */
 public class Map extends ScreenAdapter implements InputProcessor{
 	ArrayList<Ingredient> pantryInventory;
-
 	ArrayList<Ingredient> shoppingList;
 	TiledMap tiledMap;
 	OrthographicCamera camera;
@@ -91,9 +90,11 @@ public class Map extends ScreenAdapter implements InputProcessor{
     Grill burgerGrill;
     Rectangle hob1;
     Rectangle hob2;
-    Texture burgerCookImage;
+    Texture burgerCookImagePost;
+    Texture burgerCookImagePre;
 
-	/**
+
+    /**
 	 * Creates new game map
 	 *
 	 * @param game instance of the game
@@ -154,8 +155,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	@Override
 	public void show() {
-        hob1 = new Rectangle(380, 420, 5,5 );
-		hob2 = new Rectangle(420, 420, 5,5 );
+        hob1 = new Rectangle(390, 400, 5,5 );
+		hob2 = new Rectangle(410, 400, 5,5 );
 
 		if (menuMusic == null || !menuMusic.isPlaying()) {
 			menuMusic = Gdx.audio.newMusic(Gdx.files.internal("background.wav"));
@@ -168,7 +169,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		customerOneImage = new Texture(Gdx.files.internal("person001.png"));
 		customerTwoImage = new Texture(Gdx.files.internal("person002.png"));
         staffImage = new Texture(Gdx.files.internal("chef2.png"));
-        burgerCookImage = new Texture(Gdx.files.internal("raw_burger.png"));
+        burgerCookImagePre = new Texture(Gdx.files.internal("raw_burger.png"));
+        burgerCookImagePost = new Texture(Gdx.files.internal("cooked_burger.png"));
 
 		//Gets all properties from imported tiled map.
 		MapProperties properties = tiledMap.getProperties();
@@ -376,9 +378,25 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		batch.begin();
 		batch.draw(chefImage, chefOne.x, chefOne.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
 		batch.draw(chefImage, chefTwo.x, chefTwo.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
-        batch.draw(burgerCookImage, hob1.x, hob1.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
-		batch.draw(burgerCookImage, hob2.x, hob2.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
 
+        ArrayList<Ingredient> hobs = burgerGrill.getItems();
+        if (hobs.get(0).getName() == "BurgerPatty") {
+            Ingredient item = hobs.get(0);
+            if (System.currentTimeMillis() - item.getCookingStartTime() > 1500 && item.getCookingStartTime() != 0) {
+                batch.draw(burgerCookImagePost, hob1.x, hob1.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
+            } else if (System.currentTimeMillis() - item.getCookingStartTime() < 1500 && item.getCookingStartTime() != 0) {
+                batch.draw(burgerCookImagePre, hob1.x, hob1.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
+            }
+        }
+
+        if (hobs.get(1).getName() == "BurgerPatty") {
+            Ingredient item = hobs.get(1);
+            if (System.currentTimeMillis() - item.getCookingStartTime() > 15000 && item.getCookingStartTime() != 0) {
+                batch.draw(burgerCookImagePost, hob2.x, hob2.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
+            } else if (System.currentTimeMillis() - item.getCookingStartTime() < 15000 && item.getCookingStartTime() != 0) {
+                batch.draw(burgerCookImagePre, hob2.x, hob2.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
+            }
+        }
 
         if (choppingStaff){
             if (choppingCounter < pantryInventory.size() - 1){
@@ -448,6 +466,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			burgerGrill.hasGrillEnded();
 		}
 
+        /*
+
+        Draw Hitboxs
+
 		ArrayList<Rectangle> hitboxes = new ArrayList<>();
 		for (int i=0; i<8; i++) {
 			hitboxes.add(loadRectangle(Integer.toString(i), 1));
@@ -484,6 +506,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			batch.draw(chefImage, box.getX(), screenHeight - (box.getY() + box.getHeight()));
 			batch.draw(chefImage, box.getX() + box.getWidth(), screenHeight - (box.getY() + box.getHeight()));
 		}
+         */
 
 		batch.end();
 	}
@@ -515,22 +538,18 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			onClickMove(x, y);
 		} else {
 			onClickObject(x, y);
-		}*/
+		}
 		for (int i=0; i<8; i++) {
 			if (loadRectangle(Integer.toString(i), 1).contains(x, Gdx.graphics.getHeight() - y)){
 				System.out.println(i);
 			}
 		}
+		 */
 
 		if (rectangleDetection(grill, x, Gdx.graphics.getHeight() - y) &&
                 ((rectangleDetection(grill, chefOne.getX(), chefOne.getY())) ||
                 (rectangleDetection(grill, chefTwo.getX(), chefTwo.getY())))){
-			if (grillOneObject != null && grillOneObject.getFlipped() == false){
-                grillOneObject.flip();
-            }
-            if (grillTwoObject != null && grillTwoObject.getFlipped() == false){
-                grillOneObject.flip();
-            }
+			burgerGrill.flipItems();
 		}
 		onClickObject(x, y);
 	}
@@ -639,7 +658,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	private void characterMovement(int keycode) {
 		int pixelPerFrame = Math.round((Gdx.graphics.getWidth() / 3) * Gdx.graphics.getDeltaTime());
-		if (keycode == 51 && collisionDetection(new Rectangle(lastClick.x, lastClick.y + pixelPerFrame, lastClick.width, lastClick.height))) {
+		/*if (keycode == 51 && collisionDetection(new Rectangle(lastClick.x, lastClick.y + pixelPerFrame, lastClick.width, lastClick.height))) {
 			lastClick.y += pixelPerFrame;
 		} else if (keycode == 29 && collisionDetection(new Rectangle(lastClick.x - pixelPerFrame, lastClick.y, lastClick.width, lastClick.height))) {
 			lastClick.x -= pixelPerFrame;
@@ -647,7 +666,16 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			lastClick.y -= pixelPerFrame;
 		} else if (keycode == 32 && collisionDetection(new Rectangle(lastClick.x + pixelPerFrame, lastClick.y, lastClick.width, lastClick.height))) {
 			lastClick.x += pixelPerFrame;
-		}
+		}*/
+        if (keycode == 51) {
+            lastClick.y += pixelPerFrame;
+        } else if (keycode == 29) {
+            lastClick.x -= pixelPerFrame;
+        } else if (keycode == 47) {
+            lastClick.y -= pixelPerFrame;
+        } else if (keycode == 32) {
+            lastClick.x += pixelPerFrame;
+        }
 		detectCollision();
 	}
 
