@@ -1,6 +1,9 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.*;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
@@ -8,6 +11,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.MapProperties;
@@ -18,7 +23,10 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Random;
 
 /**
  * Main game screen which enables the user to control the map.
@@ -92,6 +100,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
     Texture burgerCookImagePost;
     Texture burgerCookImagePre;
     Long startTime = 0L;
+    BitmapFont font;
 
 
     /**
@@ -156,6 +165,12 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	@Override
 	public void show() {
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("saucer/SaucerBB.ttf"));
+        FreeTypeFontParameter parameter = new FreeTypeFontParameter();
+        parameter.size = 12;
+        font = generator.generateFont(parameter);
+
+
         hob1 = new Rectangle(390, 400, 5,5 );
 		hob2 = new Rectangle(410, 400, 5,5 );
 
@@ -459,7 +474,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			}
 		}
 
-		BitmapFont font = new BitmapFont();
         String grillInfo = burgerGrill.displayGrillInfo();
 		font.draw(batch, grillInfo, 10, 10);
         if (rectangleDetection(grill, chefOne.getX(), chefOne.getY()) ||
