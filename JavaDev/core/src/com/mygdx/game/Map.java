@@ -6,6 +6,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -101,6 +102,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
     Texture burgerCookImagePre;
     Long startTime = 0L;
     BitmapFont font;
+    String message;
+    Long lastMessage;
 
 
     /**
@@ -165,9 +168,13 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	@Override
 	public void show() {
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("saucer/SaucerBB.ttf"));
+        message = "";
+        lastMessage = 0L;
+
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("karmatic-arcade/ka1.ttf"));
         FreeTypeFontParameter parameter = new FreeTypeFontParameter();
         parameter.size = 12;
+        parameter.color = Color.BLUE;
         font = generator.generateFont(parameter);
 
 
@@ -373,7 +380,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	@Override
 	public void render(float delta) {
-
      	// Set black background and clear screen
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -426,7 +432,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
                 }
                 if (System.currentTimeMillis() - lastChop > 5000){
                     pantryInventory.get(choppingCounter).chopIngredient();
-                    System.out.println(pantryInventory.get(choppingCounter).getName());
+                    lastMessage = System.currentTimeMillis();
+                    message = String.format("%s Chopped!", pantryInventory.get(choppingCounter).getName());
                     lastChop = System.currentTimeMillis();
                 }
             }
@@ -475,7 +482,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		}
 
         String grillInfo = burgerGrill.displayGrillInfo();
-		font.draw(batch, grillInfo, 10, 10);
+		font.draw(batch, grillInfo, 20, 20);
         if (rectangleDetection(grill, chefOne.getX(), chefOne.getY()) ||
                 rectangleDetection(grill, chefTwo.getX(), chefTwo.getY())) {
             Ingredient temp = burgerGrill.hasGrillEnded();
@@ -483,6 +490,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
                 shoppingList.add(temp);
             }
 		}
+
+        if (System.currentTimeMillis() - lastMessage < 5000){
+            font.draw(batch, message, 300, 300);
+        }
 
         /*
 
@@ -774,6 +785,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
         if (shoppingList.isEmpty()){
             return;
         }
+        ArrayList<Integer> counter = new ArrayList<>();
+        for (int i=0; i < 2; i++){
+            counter.add(0);
+        }
         iterator = shoppingList.iterator();
         while (iterator.hasNext()){
 			Ingredient tempObject = iterator.next();
@@ -781,19 +796,22 @@ public class Map extends ScreenAdapter implements InputProcessor{
                 case "Bun":
                     //tempObject = moveToNextObject(tempObject, true);
 					iterator.remove();
+                    counter.set(0, counter.get(0) + 1);
 					pantryInventory.add(tempObject);
 					break;
                 case "BurgerPatty":
                     //tempObject = moveToNextObject(tempObject, true);
 					iterator.remove();
+                    counter.set(1, counter.get(1) + 1);
 					pantryInventory.add(tempObject);
 					break;
                 default:
                     //tempObject = moveToNextObject(tempObject, false);
             }
         }
-		//TODO: Display on screen.
-		System.out.println("Ingredients Collected CHILLER");
+        message = String.format("Burger Patty %d %n Burger Bun %d %n",
+                counter.get(0), counter.get(1));
+        lastMessage = System.currentTimeMillis();
 	}
 
     /*public Ingredient moveToNextObject(Ingredient iteratorItem, Boolean delete){
@@ -840,6 +858,11 @@ public class Map extends ScreenAdapter implements InputProcessor{
         if (shoppingList.isEmpty()){
             return;
         }
+        // Counter for each item organised via list.
+        ArrayList<Integer> counter = new ArrayList<>();
+        for (int x=0;x < 4;x++){
+            counter.add(0);
+        }
         iterator = shoppingList.iterator();
         while (iterator.hasNext()){
 			Ingredient tempObject = iterator.next();
@@ -848,28 +871,34 @@ public class Map extends ScreenAdapter implements InputProcessor{
                     //tempObject = moveToNextObject(tempObject, true);
 					iterator.remove();
 					pantryInventory.add(tempObject);
+                    counter.set(0, counter.get(0) + 1);
 					break;
 				case "Chicken":
                     //tempObject = moveToNextObject(tempObject, true);
 					iterator.remove();
 					pantryInventory.add(tempObject);
+                    counter.set(1, counter.get(1) + 1);
 					break;
 				case "Lettuce":
                     //tempObject = moveToNextObject(tempObject, true);
 					iterator.remove();
 					pantryInventory.add(tempObject);
+                    counter.set(2, counter.get(2) + 1);
 					break;
 				case "Peppers":
                     //tempObject = moveToNextObject(tempObject, true);
 					iterator.remove();
 					pantryInventory.add(tempObject);
+                    counter.set(3, counter.get(3) + 1);
 					break;
 				default:
                     //tempObject = moveToNextObject(tempObject, false);
             }
         }
 		//TODO: Display on screen.
-		System.out.println("Ingredients Collected SALAD");
+		message = String.format("Salad Dressing %d %n Chicken %d %n Lettuce %d %n Peppers %d %n",
+                counter.get(0), counter.get(1), counter.get(2), counter.get(3));
+        lastMessage = System.currentTimeMillis();
 	}
 
 	/**
@@ -887,13 +916,13 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	public void assembly() {
         Boolean allComplete = true;
+        message = "";
 		for (Recipe order : orders) {
-			order.verifyCompletion();
-			if (order.assembled == true) {
+			if (order.assembled != order.verifyCompletion() && order.assembled == true) {
 				removeIngredients(order);
                 Sound assemblySound = Gdx.audio.newSound(Gdx.files.internal("assembly station sound.wav"));
                 assemblySound.play();
-				System.out.println("COMPLETED AN ORDER");
+                message += order.getName();
 				//TODO: Display on map.
 			} else {
                 allComplete = false;

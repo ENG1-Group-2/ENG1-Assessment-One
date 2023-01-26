@@ -3,7 +3,6 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Rectangle;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.util.ArrayList;
 
@@ -26,11 +25,13 @@ public class Grill{
 
     public String displayGrillInfo() {
         String temp = "";
+        int counter = 0;
         for (Ingredient item : hobs) {
+            counter ++;
             if (item.getName() != null) {
                 long timeDifference = System.currentTimeMillis() - item.getCookingStartTime();
                 timeDifference = (timeDifference / 1000) % 60;
-                temp += "Grill One Timer:" + timeDifference;
+                temp += "Grill" + counter + "Timer:" + timeDifference;
             }
         }
         //System.out.println(temp);
