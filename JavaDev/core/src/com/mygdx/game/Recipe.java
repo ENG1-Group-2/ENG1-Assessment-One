@@ -26,7 +26,7 @@ public class Recipe {
      */
     public Boolean verifyCompletion(){
         for (Ingredient ingredient: ingredients){
-            if (ingredient.getChopped() || ingredient.getCooked() ||
+            if (ingredient.getChopped() && ingredient.getCooked() &&
             ingredient.getFlipped()){
                 assembled = true;
                 return true;

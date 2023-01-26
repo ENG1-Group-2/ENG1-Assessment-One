@@ -37,15 +37,18 @@ public class Grill{
         return temp;
     }
 
-    public void hasGrillEnded(){
+    public Ingredient hasGrillEnded(){
         for (int i = 0; hobs.size() > i; i++) {
             if (hobs.get(i).getName() != null &&
                     System.currentTimeMillis() - hobs.get(i).getCookingStartTime() >= hobs.get(i).getCookingTime() * 1000){
-                hobs.get(i).endCook();
+                if (hobs.get(i).endCook() == false){
+                    return hobs.get(i);
+                }
                 hobs.set(i, new Ingredient(null, false, false, false));
                 grillSound.pause();
             }
         }
+        return null;
     }
 
     /**

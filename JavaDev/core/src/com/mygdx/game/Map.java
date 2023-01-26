@@ -464,7 +464,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		font.draw(batch, grillInfo, 10, 10);
         if (rectangleDetection(grill, chefOne.getX(), chefOne.getY()) ||
                 rectangleDetection(grill, chefTwo.getX(), chefTwo.getY())) {
-			burgerGrill.hasGrillEnded();
+            Ingredient temp = burgerGrill.hasGrillEnded();
+            if (temp != null){
+                shoppingList.add(temp);
+            }
 		}
 
         /*
@@ -878,12 +881,11 @@ public class Map extends ScreenAdapter implements InputProcessor{
                 assemblySound.play();
 				System.out.println("COMPLETED AN ORDER");
 				//TODO: Display on map.
-			}
-            else{
+			} else {
                 allComplete = false;
             }
 		}
-        if (allComplete){
+        if (allComplete && orders.size() == 5){
             System.out.println(System.currentTimeMillis() - startTime);
         }
 	}
