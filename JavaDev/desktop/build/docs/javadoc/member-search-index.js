@@ -1,1 +1,0 @@
-memberSearchIndex = [{"p":"com.mygdx.game","c":"DesktopLauncher","l":"DesktopLauncher()","u":"%3Cinit%3E()"},{"p":"com.mygdx.game","c":"DesktopLauncher","l":"main(String[])","u":"main(java.lang.String[])"}];updateSearchResults();
