@@ -429,13 +429,13 @@ public class Map extends ScreenAdapter implements InputProcessor{
 				break;
 			}
 		}
-
+        /*
         if (choppingStaff){
             if (choppingCounter <= pantryInventory.size() - 1){
                 // TODO: Make chef appear at the right place.
                 /*if (choppingCounter == 0 && pantryInventory.get(choppingCounter).chopped == false){
                     lastChop = System.currentTimeMillis();
-                }*/
+                }
                 if (pantryInventory.get(choppingCounter).chopped){
                     choppingCounter += 1;
                 }
@@ -452,6 +452,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
             }
 
         }
+         */
 
 		if (customerCounter != 0) {
 				//If it has been 20 seconds since a customer appeared.

@@ -1,12 +1,9 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-
-import java.util.ArrayList;
 
 public class PiazzaPanicGame extends Game{
     SpriteBatch batch;
@@ -19,7 +16,7 @@ public class PiazzaPanicGame extends Game{
         shapeRenderer = new ShapeRenderer();
         font = new BitmapFont();
 
-        setScreen(new Map(this));
+        setScreen(new MainMenu(this));
     }
 
     public void render(){
