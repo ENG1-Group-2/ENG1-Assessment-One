@@ -88,6 +88,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
     Sound grillSound;
     Iterator<Ingredient> iterator;
     Boolean choppingStaff = false;
+	Boolean chopClick = false;
     Long lastChop = 0L;
     int choppingCounter = 0;
     Long ingredientsForSaladTime = 0L;
@@ -100,6 +101,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
     Rectangle hob2;
     Texture burgerCookImagePost;
     Texture burgerCookImagePre;
+	Texture knifeImage;
     Long startTime = 0L;
     BitmapFont font;
     String message;
@@ -194,6 +196,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
         staffImage = new Texture(Gdx.files.internal("chef2.png"));
         burgerCookImagePre = new Texture(Gdx.files.internal("raw_burger.png"));
         burgerCookImagePost = new Texture(Gdx.files.internal("cooked_burger.png"));
+		knifeImage = new Texture(Gdx.files.internal("knives.png"));
 
 		//Gets all properties from imported tiled map.
 		MapProperties properties = tiledMap.getProperties();
@@ -420,18 +423,25 @@ public class Map extends ScreenAdapter implements InputProcessor{
             }
         }
 
+		for (Ingredient ingredient: pantryInventory){
+			if (ingredient.getChopped() == false){
+				batch.draw(knifeImage, Math.round(screenWidth * 0.43), Math.round(screenHeight * 0.83), Math.round(screenWidth / 20), Math.round(screenHeight / 20));
+				break;
+			}
+		}
+
         if (choppingStaff){
-            if (choppingCounter < pantryInventory.size() - 1){
+            if (choppingCounter <= pantryInventory.size() - 1){
                 // TODO: Make chef appear at the right place.
-                batch.draw(staffImage, 275, 350, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
-                if (choppingCounter == 0 && pantryInventory.get(choppingCounter).chopped == false){
+                /*if (choppingCounter == 0 && pantryInventory.get(choppingCounter).chopped == false){
                     lastChop = System.currentTimeMillis();
-                }
+                }*/
                 if (pantryInventory.get(choppingCounter).chopped){
                     choppingCounter += 1;
                 }
-                if (System.currentTimeMillis() - lastChop > 5000){
+                if (System.currentTimeMillis() - lastChop > 5000 && chopClick){
                     pantryInventory.get(choppingCounter).chopIngredient();
+					chopClick = false;
                     lastMessage = System.currentTimeMillis();
                     message = String.format("%s Chopped!", pantryInventory.get(choppingCounter).getName());
                     lastChop = System.currentTimeMillis();
@@ -580,6 +590,11 @@ public class Map extends ScreenAdapter implements InputProcessor{
                 (rectangleDetection(grill, chefTwo.getX(), chefTwo.getY())))){
 			burgerGrill.flipItems();
 		}
+		if (rectangleDetection(choppingStation, x, Gdx.graphics.getHeight() - y) &&
+				((rectangleDetection(choppingStation, chefOne.getX(), chefOne.getY())) ||
+						(rectangleDetection(choppingStation, chefTwo.getX(), chefTwo.getY())))){
+			chopClick = true;
+		}
 		onClickObject(x, y);
 	}
 
@@ -712,7 +727,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 * Detects any collisions between selected chef and work stations
 	 */
 	private void detectCollision(){
-		/** if (lastClick.overlaps(ingredientsStation)){
+		/* if (lastClick.overlaps(ingredientsStation)){
 			if (pantryInventory == null){
 				game.setScreen(new PantrySelection(game, new ArrayList<Ingredient>(), orders));
 			}
@@ -918,7 +933,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
         Boolean allComplete = true;
         message = "";
 		for (Recipe order : orders) {
-			if (order.assembled != order.verifyCompletion() && order.assembled == true) {
+			if (order.assembled != order.verifyCompletion() && order.assembled) {
 				removeIngredients(order);
                 Sound assemblySound = Gdx.audio.newSound(Gdx.files.internal("assembly station sound.wav"));
                 assemblySound.play();
