@@ -5,10 +5,12 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
@@ -88,14 +90,19 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
         ingredientList = "Ingredients:";
 
         for (int i=0; i < ingredients.size(); i++){
-            ingredientList += "\n" + ingredients.get(i).getName();
+            ingredientList += "\n" + ingredients.get(i).getName() + " " + ingredients.get(i).getCooked()+ " " + ingredients.get(i).getChopped();
         }
         /*TODO: Change scale of the text so it all fits on screen regardless of resolution
                 maybe split ingredient list into two columns
          */
-        font.getData().setScale(Math.round(Gdx.graphics.getHeight() / 300), Math.round(Gdx.graphics.getHeight() / 300));
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("karmatic-arcade/ka1.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = (Gdx.graphics.getHeight() / 38);
+        parameter.color = Color.WHITE;
+        font = generator.generateFont(parameter);
         font.draw(batch, orderList, Math.round(Gdx.graphics.getWidth() * 0.11), Math.round(Gdx.graphics.getHeight() * 0.84));
         font.draw(batch, ingredientList, Math.round(Gdx.graphics.getWidth() * 0.575), Math.round(Gdx.graphics.getHeight() * 0.84));
+
         batch.end();
 
 
