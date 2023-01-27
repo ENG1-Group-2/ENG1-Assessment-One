@@ -1,0 +1,8 @@
+.idea
+.vscode
+core/bin
+core/build
+desktop/bin
+desktop/build
+desktop/out
+out
