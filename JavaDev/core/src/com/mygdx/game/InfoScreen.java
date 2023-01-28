@@ -104,8 +104,6 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
         font.draw(batch, ingredientList, Math.round(Gdx.graphics.getWidth() * 0.575), Math.round(Gdx.graphics.getHeight() * 0.84));
 
         batch.end();
-
-
     }
 
     @Override

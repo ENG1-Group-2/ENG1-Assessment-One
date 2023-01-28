@@ -23,6 +23,8 @@ import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import org.lwjgl.Sys;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,18 +72,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	int screenHeight = Gdx.graphics.getHeight();
 	boolean chefMove = false;
 	int keyCode;
-	int mapWidth;
-	int mapHeight;
-	int tileSize;
-	Rectangle ingredientsForSalad;
-	Ingredient saladDressing;
-	Ingredient burgerPatty;
-	Ingredient breadBuns;
-	Ingredient lettuce;
-	Ingredient pepper;
-	Ingredient cookedChicken;
-	Ingredient grillOneObject;
-	Ingredient grillTwoObject;
+	int mapWidth, mapHeight, tileSize;
 
 	final PiazzaPanicGame game;
     Music menuMusic;
@@ -174,7 +165,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("karmatic-arcade/ka1.ttf"));
         FreeTypeFontParameter parameter = new FreeTypeFontParameter();
-        parameter.size = 12;
+        parameter.size = (Gdx.graphics.getHeight() / 38);
         parameter.color = Color.BLUE;
         font = generator.generateFont(parameter);
 
@@ -186,6 +177,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			menuMusic = Gdx.audio.newMusic(Gdx.files.internal("background.wav"));
 			menuMusic.setLooping(true);
 			menuMusic.play();
+			menuMusic.pause();
 		}
 
 		chefImage = new Texture(Gdx.files.internal("chef.png"));
@@ -500,10 +492,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
                 shoppingList.add(temp);
             }
 		}
-
-        if (System.currentTimeMillis() - lastMessage < 5000){
-            font.draw(batch, message, 300, 300);
-        }
+		System.out.println(message);
+		font.draw(batch, message, Math.round(screenWidth * 0.47), Math.round(screenHeight * 0.625));
 
         /*
 
@@ -656,7 +646,9 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	@Override
 	public boolean keyDown(int keycode) {
 		if (keycode == Input.Keys.H){
-			game.setScreen(new InfoScreen(game, orders, pantryInventory, customerCounter, shoppingList, menuMusic, burgerGrill, startTime));
+			game.setScreen(new InfoScreen(game, this));
+		} else if (keycode == Input.Keys.I){
+			game.setScreen(new InfoScreen(game, this));
 		}
 		if (lastClickObject == true) {
 			/*return false;
@@ -681,15 +673,38 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		return false;
 	}
 
-    public Boolean collisionDetection(Rectangle sprite){
+    public Boolean collisionDetection(float x, float y){
         //Layers 0 and 11 as in tiled map.
-        for (int i=0; i<8; i++) {
+        /*for (int i=0; i<1; i++) {
+			Rectangle temp = loadRectangle(Integer.toString(i), 1);
             if (loadRectangle(Integer.toString(i), 1).contains(sprite.getX(), sprite.getY())){
 				System.out.println("collision");
                 return false;
             }
-        }
-		System.out.println("none");
+        }*/
+
+		if (y > screenHeight * 0.75){
+			System.out.println("collision");
+			return false;
+		}
+		if (y < screenHeight * 0.25){
+			System.out.println("collision 2");
+			return false;
+		}
+		if (y < screenHeight * 0.4 && x > screenWidth * 0.5){
+			System.out.println("collision 3");
+			return false;
+		}
+		if (x < (screenWidth * 0.015)){
+			System.out.println("collision 4");
+			return false;
+		}
+		if (x > (screenWidth * 0.925)){
+			System.out.println("collision 5");
+			return false;
+		}
+
+		//System.out.println("none");
         return true;
 
     }
@@ -711,16 +726,17 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		} else if (keycode == 32 && collisionDetection(new Rectangle(lastClick.x + pixelPerFrame, lastClick.y, lastClick.width, lastClick.height))) {
 			lastClick.x += pixelPerFrame;
 		}*/
-        if (keycode == 51) {
-            lastClick.y += pixelPerFrame;
-        } else if (keycode == 29) {
+        if (keycode == 51 && collisionDetection(lastClick.getX(), lastClick.getY() + pixelPerFrame)) {
+			lastClick.y += pixelPerFrame;
+        } else if (keycode == 29 && collisionDetection(lastClick.getX() - pixelPerFrame, lastClick.getY())) {
             lastClick.x -= pixelPerFrame;
-        } else if (keycode == 47) {
+        } else if (keycode == 47 && collisionDetection(lastClick.getX(), lastClick.getY() - pixelPerFrame)) {
             lastClick.y -= pixelPerFrame;
-        } else if (keycode == 32) {
+        } else if (keycode == 32 && collisionDetection(lastClick.getX() + pixelPerFrame, lastClick.getY())) {
             lastClick.x += pixelPerFrame;
         }
 		detectCollision();
+
 	}
 
 	/**
@@ -930,11 +946,15 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 * Checks held ingredients and assembles complete orders
 	 */
 	public void assembly() {
-        Boolean allComplete = true;
-        message = "";
-		for (Recipe order : orders) {
-			if (order.assembled != order.verifyCompletion() && order.assembled) {
-				removeIngredients(order);
+		Iterator<Recipe> iterator = orders.iterator();
+		ArrayList<Integer> counter = new ArrayList<>();
+		for (int i=0; i<recipes.size(); i++){
+			counter.add(0);
+		}
+		while (iterator.hasNext()) {
+			Recipe tempObject = iterator.next();
+			if (tempObject.verifyCompletion()) {
+				removeIngredients(tempObject);
                 Sound assemblySound = Gdx.audio.newSound(Gdx.files.internal("assembly station sound.wav"));
                 assemblySound.play();
                 message += order.getName();

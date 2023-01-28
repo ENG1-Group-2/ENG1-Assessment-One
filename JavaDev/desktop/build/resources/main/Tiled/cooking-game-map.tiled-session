@@ -78,10 +78,10 @@
                 6
             ],
             "scale": 1,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 478.5,
-                "y": 298.5
+                "x": 468.5,
+                "y": 296.5
             }
         },
         "new Assets Kitchen.tsx": {
