@@ -37,40 +37,44 @@ import java.util.Random;
  * Auto launches this screen in the current prototype.
  */
 public class Map extends ScreenAdapter implements InputProcessor{
+	// Stores any items that have been collected.
 	ArrayList<Ingredient> pantryInventory;
+	// Stores any items that are yet to be collected.
 	ArrayList<Ingredient> shoppingList;
-	TiledMap tiledMap;
-	OrthographicCamera camera;
-	TiledMapRenderer tiledMapRenderer;
-	Rectangle chefOne;
-	Rectangle chefTwo;
-	Rectangle customerOne;
-	Rectangle customerTwo;
-	Rectangle chiller;
-	Rectangle grill;
-	Rectangle choppingStation;
-	Rectangle assemblyStation;
-	Texture chefImage;
-	Texture customerOneImage;
-	Texture customerTwoImage;
-    Texture staffImage;
-	SpriteBatch batch;
-	//Keep track on what object was clicked last to help with movement.
-	Rectangle lastClick;
+	// Put all sprites in this list.
+	ArrayList<Rectangle> sprites = new ArrayList<>();
 	//Keep track of whether a relevant object was clicked previously.
 	Boolean lastClickObject;
-	ArrayList<Rectangle> sprites = new ArrayList<>();
+	// Default for timed mode.
+	// TODO: Change variable if in endless mode.
 	int customerCounter = 5;
-	boolean drawCustomerOne;
-	boolean drawCustomerTwo;
+	boolean drawCustomerTwo, drawCustomerOne;
+	// Time of the last customer appearance.
 	long lastRender;
-	Recipe chickenSalad;
-	Recipe beefBurger;
+	// TODO: Define more recipes.
+	Recipe chickenSalad, beefBurger;
+	// TODO: Add ingredients for new recipes.
+	Ingredient saladDressing, burgerPatty, breadBuns, lettuce, pepper, cookedChicken;
 	ArrayList<Recipe> recipes;
 	ArrayList<Recipe> orders;
+	int finishedOrders = customerCounter;
+
+	TiledMap tiledMap;
+	TiledMapRenderer tiledMapRenderer;
+	OrthographicCamera camera;
+	SpriteBatch batch;
+
+	// Placements of customers placing orders.
+	Rectangle customerOne, customerTwo;
+	// All stations that can be interacted with.
+	Rectangle chiller, grill, choppingStation, assemblyStation, ingredientsForSalad;
+	Texture chefImage, customerOneImage, customerTwoImage, staffImage;
+	//Keep track on what object was clicked last to help with movement.
+	Rectangle lastClick;
 	int screenWidth = Gdx.graphics.getWidth();
 	int screenHeight = Gdx.graphics.getHeight();
 	boolean chefMove = false;
+	// The last key pressed.
 	int keyCode;
 	int mapWidth, mapHeight, tileSize;
 
@@ -78,25 +82,18 @@ public class Map extends ScreenAdapter implements InputProcessor{
     Music menuMusic;
     Iterator<Ingredient> iterator;
     Boolean choppingStaff = false;
-	Boolean chopClick = false;
-    Long lastChop = 0L;
-    int choppingCounter = 0;
-    Long ingredientsForSaladTime = 0L;
     Long choppingStationTime = 0L;
-    Long assemblyStationTime = 0L;
-    Long chillerTime = 0L;
-    Long grillTime = 0L;
     Grill burgerGrill;
-    Rectangle hob1;
-    Rectangle hob2;
-    Texture burgerCookImagePost;
-    Texture burgerCookImagePre;
+    Rectangle hob1, hob2;
+    Texture burgerCookImagePost, burgerCookImagePre;
 	Texture knifeImage;
     Long startTime = 0L;
     BitmapFont font;
     String message;
     Long lastMessage;
-
+	Rectangle chefOne = new Rectangle(Math.round(screenWidth * 0.92), Math.round(screenHeight * 0.60), Math.round(screenWidth * 0.1), Math.round(screenWidth * 0.1) );
+	Rectangle chefTwo = new Rectangle(Math.round(screenWidth * 0.92), Math.round(screenHeight * 0.70), Math.round(screenWidth * 0.1), Math.round(screenWidth * 0.1));
+	Boolean assemblyStationLock = false;
 
     /**
 	 * Creates new game map
@@ -133,6 +130,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
             this.burgerGrill = grill;
             this.startTime = startTime;
 	}
+
 
 	/**
 	 * Loads given rectangle from the Tiled map.
@@ -210,19 +208,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
 
-		//Position chefs near staff door.
-		chefOne = new Rectangle();
-		chefOne.x = Math.round(screenWidth * 0.92);
-		chefOne.y = Math.round(screenHeight * 0.60);
-		chefOne.width = Math.round(screenWidth * 0.1);
-		chefOne.height = Math.round(screenWidth * 0.1);
-
-		chefTwo = new Rectangle();
-		chefTwo.x = Math.round(screenWidth * 0.92);
-		chefTwo.y = Math.round(screenHeight * 0.70);
-		chefTwo.width = Math.round(screenWidth * 0.1);
-		chefTwo.height = Math.round(screenWidth * 0.1);
-
 		/*
 		// Get properties for ingredients stations rectangle stored in the tiled map.
 		objects = tiledMap.getLayers().get(0).getObjects();
@@ -264,37 +249,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	}
 
 	/**
-	 * Calculates the time any items on the grills have been cooking and produces display string
-	 *
-	 * @return Text including timer for the two grills
-	 */
-
-	public String displayGrillInfomation(){
-		String temp = "";
-		if (grillOneObject != null){
-			long timeDifference = System.currentTimeMillis() - grillOneObject.getCookingStartTime();
-			timeDifference = (timeDifference/1000) % 60;
-			temp += "Grill One Timer:" + timeDifference;
-			if (timeDifference >= grillOneObject.getCookingTime() &&
-					(chefOne.overlaps(grill) || chefTwo.overlaps(grill))){
-				grillOneObject.endCook();
-				grillOneObject = null;
-			}
-		}
-		if (grillTwoObject != null){
-			long timeDifference = System.currentTimeMillis() - grillTwoObject.getCookingStartTime();
-			timeDifference = (timeDifference/1000) % 60;
-			temp += "Grill Two Timer:" + timeDifference;
-			if (timeDifference >= grillTwoObject.getCookingTime() &&
-					(chefOne.overlaps(grill) || chefTwo.overlaps(grill))){
-				grillTwoObject.endCook();
-				grillTwoObject = null;
-			}
-		}
-		return temp;
-	}
-
-	/**
 	 * Creates a base instance of every ingredient being used
 	 */
 	public void createIngredients(){
@@ -302,8 +256,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		pepper = new Ingredient("Peppers", false, true, true);
 		cookedChicken = new Ingredient("Chicken", true, true, true);
 		saladDressing = new Ingredient("SaladDressing", true, true, true);
-		burgerPatty = new HotIngredient("BurgerPatty", true, 45, false);
-		breadBuns = new HotIngredient("Bun", true, 15, true);
+		burgerPatty = new HotIngredient("BurgerPatty", true, 15, false);
+		breadBuns = new HotIngredient("Bun", true, 5, true);
 	}
 
 	/**
@@ -398,18 +352,18 @@ public class Map extends ScreenAdapter implements InputProcessor{
         ArrayList<Ingredient> hobs = burgerGrill.getItems();
         if (hobs.get(0).getName() == "BurgerPatty") {
             Ingredient item = hobs.get(0);
-            if (System.currentTimeMillis() - item.getCookingStartTime() > 1500 && item.getCookingStartTime() != 0) {
+            if (System.currentTimeMillis() - item.getCookingStartTime() > 2000 && item.getCookingStartTime() != 0) {
                 batch.draw(burgerCookImagePost, hob1.x, hob1.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
-            } else if (System.currentTimeMillis() - item.getCookingStartTime() < 1500 && item.getCookingStartTime() != 0) {
+            } else if (System.currentTimeMillis() - item.getCookingStartTime() < 2000 && item.getCookingStartTime() != 0) {
                 batch.draw(burgerCookImagePre, hob1.x, hob1.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
             }
         }
 
         if (hobs.get(1).getName() == "BurgerPatty") {
             Ingredient item = hobs.get(1);
-            if (System.currentTimeMillis() - item.getCookingStartTime() > 15000 && item.getCookingStartTime() != 0) {
+            if (System.currentTimeMillis() - item.getCookingStartTime() > 2000 && item.getCookingStartTime() != 0) {
                 batch.draw(burgerCookImagePost, hob2.x, hob2.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
-            } else if (System.currentTimeMillis() - item.getCookingStartTime() < 15000 && item.getCookingStartTime() != 0) {
+            } else if (System.currentTimeMillis() - item.getCookingStartTime() < 2000 && item.getCookingStartTime() != 0) {
                 batch.draw(burgerCookImagePre, hob2.x, hob2.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
             }
         }
@@ -420,7 +374,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 				break;
 			}
 		}
-
+		/*
         if (choppingStaff){
             if (choppingCounter <= pantryInventory.size() - 1){
                 if (choppingCounter == 0 && pantryInventory.get(choppingCounter).chopped == false){
@@ -429,7 +383,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
                 if (pantryInventory.get(choppingCounter).chopped){
                     choppingCounter += 1;
                 }
-                if (System.currentTimeMillis() - lastChop > 5000 && chopClick){
+                if (System.currentTimeMillis() - lastChop > 1000 && chopClick){
                     pantryInventory.get(choppingCounter).chopIngredient();
 					chopClick = false;
                     lastMessage = System.currentTimeMillis();
@@ -442,6 +396,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
             }
 
         }
+		*/
 
 
 		if (customerCounter != 0) {
@@ -583,7 +538,13 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		if (rectangleDetection(choppingStation, x, Gdx.graphics.getHeight() - y) &&
 				((rectangleDetection(choppingStation, chefOne.getX(), chefOne.getY())) ||
 						(rectangleDetection(choppingStation, chefTwo.getX(), chefTwo.getY())))){
-			chopClick = true;
+			for (Ingredient ingredient: pantryInventory){
+				if (ingredient.getChopped() == false){
+					ingredient.chopIngredient();
+					message = String.format("%s Chopped!", ingredient.getName());
+					break;
+				}
+			}
 		}
 		onClickObject(x, y);
 	}
@@ -760,39 +721,25 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		 */
 		// TODO: A neater way of object detection.
 		if (rectangleDetection(ingredientsForSalad, lastClick.getX(), lastClick.getY())){
-            if (timerStations(ingredientsForSaladTime)) {
-                addSaladIngredients();
-                ingredientsForSaladTime = System.currentTimeMillis();
-				//System.out.println(("Salad"));
-            }
+			addSaladIngredients();
 		}
-		if (rectangleDetection(choppingStation, lastClick.getX(), lastClick.getY())){
-            if (timerStations(choppingStationTime)) {
-                chopIngredients();
-                choppingStationTime = System.currentTimeMillis();
-				//System.out.println(("Chop"));
-            }
+		if (rectangleDetection(choppingStation, lastClick.getX(), lastClick.getY())) {
+				chopIngredients();
+				choppingStationTime = System.currentTimeMillis();
 		}
-		if (rectangleDetection(assemblyStation, lastClick.getX(), lastClick.getY())){
-            if (timerStations(assemblyStationTime)) {
-                assembly();
-                assemblyStationTime = System.currentTimeMillis();
-				//System.out.println(("Assembly"));
-            }
+		if (rectangleDetection(assemblyStation, lastClick.getX(), lastClick.getY()) && assemblyStationLock == false) {
+			assembly();
+			assemblyStationLock = true;
+		} else {
+			assemblyStationLock = false;
 		}
-		if (rectangleDetection(chiller, lastClick.getX(), lastClick.getY())){
-            if (timerStations(chillerTime)) {
-                getChillerItems();
-                chillerTime = System.currentTimeMillis();
-				//System.out.println(("Chiller"));
-            }
+		if (rectangleDetection(chiller, lastClick.getX(), lastClick.getY())) {
+			getChillerItems();
 		}
-		if (rectangleDetection(grill, lastClick.getX(), lastClick.getY())){
-                chooseGrillItems();
-                grillTime = System.currentTimeMillis();
-				//System.out.println(("Grill"));
-            }
+		if (rectangleDetection(grill, lastClick.getX(), lastClick.getY())) {
+			chooseGrillItems();
 		}
+	}
 
 	/**
 	 * Checks if last interaction with station was at least 15 seconds ago
@@ -957,15 +904,29 @@ public class Map extends ScreenAdapter implements InputProcessor{
 				removeIngredients(tempObject);
                 Sound assemblySound = Gdx.audio.newSound(Gdx.files.internal("assembly station sound.wav"));
                 assemblySound.play();
-                message += order.getName();
-				//TODO: Display on map.
-			} else {
-                allComplete = false;
-            }
+				for (int i = 0; i<recipes.size(); i++){
+                if (tempObject.getName() == recipes.get(i).getName()){
+					counter.set(i, counter.get(i) + 1);
+					}
+				}
+				iterator.remove();
+				finishedOrders --;
+			}
 		}
-        if (allComplete && orders.size() == 5){
-            System.out.println(System.currentTimeMillis() - startTime);
-        }
+		message = "Assembled";
+		for (int i = 0; i<recipes.size(); i++) {
+			if (counter.get(i) >= 0) {
+				message += String.format("%n %s %d", recipes.get(i).getName(), counter.get(i));
+				lastMessage = System.currentTimeMillis();
+			}
+		}
+
+		if (finishedOrders == 0){
+			Long finishTime = ((System.currentTimeMillis() - startTime) / 1000) % 60;
+			lastMessage = System.currentTimeMillis();
+			message = String.format("Game Complete in %d seconds", finishTime);
+		}
+
 	}
 
 	/**
@@ -1015,21 +976,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
                         break;
 				}
 			}
-		}
-	}
-
-	/**
-	 * Begins cooking an ingredient
-	 * @param toCook ingredient to cook
-	 */
-	public void grillItem(Ingredient toCook){
-		if (grillOneObject == null){
-			grillOneObject = toCook;
-			toCook.startToCook();
-		}
-		else{
-			grillTwoObject = toCook;
-			toCook.startToCook();
 		}
 	}
 

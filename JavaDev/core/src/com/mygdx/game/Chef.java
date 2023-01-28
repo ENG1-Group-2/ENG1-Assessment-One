@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class Chef {
     Rectangle location;
-    ArrayList<Ingredient> inventory;
+
 
 
 }

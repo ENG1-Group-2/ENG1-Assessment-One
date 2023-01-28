@@ -25,15 +25,14 @@ public class Recipe {
      * @return truth value of completion
      */
     public Boolean verifyCompletion(){
+        assembled = true;
         for (Ingredient ingredient: ingredients){
-            if (ingredient.getChopped() && ingredient.getCooked() &&
-            ingredient.getFlipped()){
-                assembled = true;
-                return true;
+            if (!(ingredient.getChopped() && ingredient.getCooked() &&
+            ingredient.getFlipped())){
+                assembled = false;
             }
         }
-        assembled = false;
-        return false;
+        return assembled;
     }
 
 
