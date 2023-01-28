@@ -85,7 +85,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 	final PiazzaPanicGame game;
     Music menuMusic;
-    Sound grillSound;
     Iterator<Ingredient> iterator;
     Boolean choppingStaff = false;
 	Boolean chopClick = false;
@@ -222,13 +221,13 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		//Position chefs near staff door.
 		chefOne = new Rectangle();
 		chefOne.x = Math.round(screenWidth * 0.92);
-		chefOne.y = Math.round(screenHeight * 0.73);
+		chefOne.y = Math.round(screenHeight * 0.60);
 		chefOne.width = Math.round(screenWidth * 0.1);
 		chefOne.height = Math.round(screenWidth * 0.1);
 
 		chefTwo = new Rectangle();
 		chefTwo.x = Math.round(screenWidth * 0.92);
-		chefTwo.y = Math.round(screenHeight * 0.83);
+		chefTwo.y = Math.round(screenHeight * 0.70);
 		chefTwo.width = Math.round(screenWidth * 0.1);
 		chefTwo.height = Math.round(screenWidth * 0.1);
 
@@ -360,10 +359,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	private void resetCustomerOne(){
 		customerOne = new Rectangle();
-		customerOne.x = 25;
-		customerOne.y = 25;
-		customerOne.width = 100;
-		customerOne.height = 100;
+		customerOne.x = Math.round(screenWidth * 0.04);
+		customerOne.y = Math.round(screenWidth * 0.03);
+		customerOne.width = Math.round(screenWidth / 20);
+		customerOne.height = Math.round(screenHeight / 20);
 	}
 
 	/**
@@ -371,10 +370,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	private void resetCustomerTwo(){
 		customerTwo = new Rectangle();
-		customerTwo.x = 600;
-		customerTwo.y = 25;
-		customerTwo.width = 100;
-		customerTwo.height = 100;
+		customerTwo.x = Math.round(screenWidth * 0.94);
+		customerTwo.y = Math.round(screenWidth * 0.03);
+		customerTwo.width = Math.round(screenWidth / 20);
+		customerTwo.height = Math.round(screenHeight / 20);
 	}
 
 	/**
@@ -429,11 +428,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 				break;
 			}
 		}
-        /*
+
         if (choppingStaff){
             if (choppingCounter <= pantryInventory.size() - 1){
-                // TODO: Make chef appear at the right place.
-                /*if (choppingCounter == 0 && pantryInventory.get(choppingCounter).chopped == false){
+                if (choppingCounter == 0 && pantryInventory.get(choppingCounter).chopped == false){
                     lastChop = System.currentTimeMillis();
                 }
                 if (pantryInventory.get(choppingCounter).chopped){
@@ -452,9 +450,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
             }
 
         }
-         */
+
 
 		if (customerCounter != 0) {
+			int pixelPerFrame = Math.round((Gdx.graphics.getWidth() / 10) * Gdx.graphics.getDeltaTime());
 				//If it has been 20 seconds since a customer appeared.
 				if (System.currentTimeMillis() - lastRender > 500) {
 					Random random = new Random();
@@ -470,25 +469,25 @@ public class Map extends ScreenAdapter implements InputProcessor{
 				// Keep on moving customers along per frame.
 				if (drawCustomerOne) {
 					// If it at the position it needs to be in.
-					if (customerOne.x > 240) {
+					if (customerOne.x > screenWidth * 0.42) {
 						drawCustomerOne = false;
 						randomOrderGeneration();
 						resetCustomerOne();
 
 					}
-					customerOne.x += 50 * Gdx.graphics.getDeltaTime();
-					batch.draw(customerOneImage, customerOne.x, customerOne.y);
+					customerOne.x += pixelPerFrame;
+					batch.draw(customerOneImage, customerOne.x, customerOne.y, Math.round(screenWidth / 40), Math.round(screenWidth / 40));
 
 				}
 
 				if (drawCustomerTwo) {
-					if (customerTwo.x < 340) {
+					if (customerTwo.x < screenWidth * 0.531) {
 						drawCustomerTwo = false;
 						resetCustomerTwo();
 						randomOrderGeneration();
 					}
-					customerTwo.x -= 50 * Gdx.graphics.getDeltaTime();
-					batch.draw(customerTwoImage, customerTwo.x, customerTwo.y);
+					customerTwo.x -= pixelPerFrame;
+					batch.draw(customerTwoImage, customerTwo.x, customerTwo.y, Math.round(screenWidth / 40), Math.round(screenWidth / 40));
 			}
 		}
 
