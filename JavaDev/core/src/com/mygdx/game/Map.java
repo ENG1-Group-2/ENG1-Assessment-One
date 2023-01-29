@@ -78,7 +78,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	// The last key pressed.
 	int keyCode;
 	int mapWidth, mapHeight, tileSize;
-    boolean assemblyLock = false;
+    boolean orderAnimation = false;
 
 	final PiazzaPanicGame game;
     Music menuMusic;
@@ -95,7 +95,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
     Long lastMessage;
 	Rectangle chefOne = new Rectangle(Math.round(screenWidth * 0.92), Math.round(screenHeight * 0.60), Math.round(screenWidth * 0.1), Math.round(screenWidth * 0.1) );
 	Rectangle chefTwo = new Rectangle(Math.round(screenWidth * 0.92), Math.round(screenHeight * 0.70), Math.round(screenWidth * 0.1), Math.round(screenWidth * 0.1));
-	Boolean assemblyStationLock = false;
+    Rectangle staffDeliver = new Rectangle(Math.round(screenWidth * 0.45), Math.round(screenHeight * 0.45), Math.round(screenWidth * 0.1), Math.round(screenWidth * 0.1));
+
 
     /**
 	 * Creates new game map
@@ -107,32 +108,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		pantryInventory = new ArrayList<>();
 		orders = new ArrayList<>();
         shoppingList = new ArrayList<>();
+        // TODO: Add any new grill stations.
         burgerGrill = new Grill(grill, 2);
         startTime = System.currentTimeMillis();
 	}
-
-	/**
-	 * Creates game map
-	 * Uses variables saved from previous map instance
-	 *
-	 * @param game instance of game
-	 * @param pantryInventoryPrev list of ingredients in inventory
-	 * @param ordersPrev list of active orders
-	 * @param customerCounter number of customers left to arrive
-	 * @param shoppingListPrev list of needed ingredients
-	 * @param menuMusic background music being played
-	 */
-	public Map(final PiazzaPanicGame game, ArrayList<Ingredient> pantryInventoryPrev, ArrayList<Recipe> ordersPrev, int customerCounter, ArrayList<Ingredient> shoppingListPrev, Music menuMusic, Grill grill, Long startTime){
-			this.game = game;
-			this.pantryInventory = pantryInventoryPrev;
-            this.orders = ordersPrev;
-			this.customerCounter = customerCounter;
-            this.shoppingList = shoppingListPrev;
-			this.menuMusic = menuMusic;
-            this.burgerGrill = grill;
-            this.startTime = startTime;
-	}
-
 
 	/**
 	 * Loads given rectangle from the Tiled map.
@@ -163,23 +142,24 @@ public class Map extends ScreenAdapter implements InputProcessor{
         message = "";
         lastMessage = 0L;
 
+        // TODO: If you don't like the font, find a ttf and change here for it to be consistent throughout.
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("karmatic-arcade/ka1.ttf"));
         FreeTypeFontParameter parameter = new FreeTypeFontParameter();
         parameter.size = (Gdx.graphics.getHeight() / 38);
         parameter.color = Color.BLUE;
         font = generator.generateFont(parameter);
 
-
         hob1 = new Rectangle(390, 400, 5,5 );
 		hob2 = new Rectangle(410, 400, 5,5 );
 
+        // Plays music if it is not playing yet.
 		if (menuMusic == null || !menuMusic.isPlaying()) {
 			menuMusic = Gdx.audio.newMusic(Gdx.files.internal("background.wav"));
 			menuMusic.setLooping(true);
 			menuMusic.play();
-			menuMusic.pause();
 		}
 
+        // TODO: Load any new images related to assessment two.
 		chefImage = new Texture(Gdx.files.internal("chef.png"));
 		tiledMap = new TmxMapLoader().load("Tiled/map.tmx");
 		customerOneImage = new Texture(Gdx.files.internal("person001.png"));
@@ -210,18 +190,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
 
-		/*
-		// Get properties for ingredients stations rectangle stored in the tiled map.
-		objects = tiledMap.getLayers().get(0).getObjects();
-		MapObject pantryAccess = objects.get("PantryAccess");
-		if (pantryAccess instanceof RectangleMapObject) {
-			RectangleMapObject pantryRectangle = (RectangleMapObject) pantryAccess;
-			this.ingredientsStation = scaleObject(pantryRectangle.getRectangle(), tileSize * mapWidth, tileSize * mapHeight);
-		}
-		else{
-			ingredientsStation = new Rectangle();}
-		 */
-
+        //TODO: Load any new hitboxes for new stations.
 		ingredientsForSalad = loadRectangle("IngredientsForSalad", 0);
 		choppingStation = loadRectangle("ChoppingStation", 0);
 		assemblyStation = loadRectangle("Assembly", 0);
@@ -231,6 +200,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
 		createIngredients();
 
+        // TODO: Add chef to sprite list.
 		// Keep list of sprites to make checking clicks easier.
 		sprites.add(chefOne);
 		sprites.add(chefTwo);
@@ -254,6 +224,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 * Creates a base instance of every ingredient being used
 	 */
 	public void createIngredients(){
+        // TODO: Load new ingredients for new recipes.
+        // Ingredients created in the format: name, chopped, cooked, flipped.
 		lettuce = new Ingredient("Lettuce", false, true, true);
 		pepper = new Ingredient("Peppers", false, true, true);
 		cookedChicken = new Ingredient("Chicken", true, true, true);
@@ -338,19 +310,25 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		tiledMapRenderer.setView(camera);
 		tiledMapRenderer.render();
 
+        // Update screen size if it has changed.
 		if ((screenWidth != Gdx.graphics.getWidth()) || (screenHeight != Gdx.graphics.getHeight())) {
 			screenWidth = Gdx.graphics.getWidth();
 			screenHeight = Gdx.graphics.getHeight();
 		}
 
+        // If key is down, move chef using WASD input.
 		if (chefMove) {
 			characterMovement(keyCode);
 		}
+
 		//Images needs to be render based upon changes.
 		batch.begin();
 		batch.draw(chefImage, chefOne.x, chefOne.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
 		batch.draw(chefImage, chefTwo.x, chefTwo.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
 
+        /* If any of the grills contain burger patties, for 2 seconds show it as uncooked and for the rest show it as
+        cooked. Changes from pink to brown.
+         */
         ArrayList<Ingredient> hobs = burgerGrill.getItems();
         if (hobs.get(0).getName() == "BurgerPatty") {
             Ingredient item = hobs.get(0);
@@ -370,37 +348,33 @@ public class Map extends ScreenAdapter implements InputProcessor{
             }
         }
 
+        // If any ingredients need chopping display the knife.
 		for (Ingredient ingredient: pantryInventory){
 			if (ingredient.getChopped() == false){
 				batch.draw(knifeImage, Math.round(screenWidth * 0.43), Math.round(screenHeight * 0.83), Math.round(screenWidth / 20), Math.round(screenHeight / 20));
 				break;
 			}
 		}
-		/*
-        if (choppingStaff){
-            if (choppingCounter <= pantryInventory.size() - 1){
-                if (choppingCounter == 0 && pantryInventory.get(choppingCounter).chopped == false){
-                    lastChop = System.currentTimeMillis();
-                }
-                if (pantryInventory.get(choppingCounter).chopped){
-                    choppingCounter += 1;
-                }
-                if (System.currentTimeMillis() - lastChop > 1000 && chopClick){
-                    pantryInventory.get(choppingCounter).chopIngredient();
-					chopClick = false;
-                    lastMessage = System.currentTimeMillis();
-                    message = String.format("%s Chopped!", pantryInventory.get(choppingCounter).getName());
-                    lastChop = System.currentTimeMillis();
-                }
-            }
-            else{
-                choppingStaff = false;
+
+        // If an order has just been done, a chef appears and takes it towards to exit to indicate the order being
+        // given out.
+        if (orderAnimation){
+            batch.draw(chefImage, staffDeliver.x, staffDeliver.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
+            int pixelPerFrame = Math.round((Gdx.graphics.getWidth() / 10) * Gdx.graphics.getDeltaTime());
+            staffDeliver.y -= pixelPerFrame;
+            if (staffDeliver.y < 0.2 * screenHeight){
+                orderAnimation = false;
             }
 
         }
-		*/
 
+        /* If the maximum number of customer allowed in this game has not been reached.
 
+        And it has been 5 seconds since the last time a customer started walking. Choose a customer to appear
+        either left or right. Set corresponding boolean value to true, so it moves at every frame, until it
+        gets near the centre where it disappeared. Once complete, the corrosponding boolean value returns to
+        false.
+         */
 		if (customerCounter != 0) {
 			int pixelPerFrame = Math.round((Gdx.graphics.getWidth() / 10) * Gdx.graphics.getDeltaTime());
 				//If it has been 20 seconds since a customer appeared.
@@ -442,57 +416,17 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
         String grillInfo = burgerGrill.displayGrillInfo();
 		font.draw(batch, grillInfo, 20, 20);
+
         if (rectangleDetection(grill, chefOne.getX(), chefOne.getY()) ||
                 rectangleDetection(grill, chefTwo.getX(), chefTwo.getY())) {
             Ingredient temp = burgerGrill.hasGrillEnded();
+            // Indicates that the cook has failed so he will need to be able to collect it again.
             if (temp != null){
                 shoppingList.add(temp);
             }
 		}
-		System.out.println(message);
+
 		font.draw(batch, message, Math.round(screenWidth * 0.47), Math.round(screenHeight * 0.625));
-
-        /*
-
-        Draw Hitboxs
-
-		ArrayList<Rectangle> hitboxes = new ArrayList<>();
-		for (int i=0; i<8; i++) {
-			hitboxes.add(loadRectangle(Integer.toString(i), 1));
-		}
-		 //Displays the corners of the hitboxes for each station. Use to help when adding/adjusting in Tiled
-		int tempInt = 0;
-
-		for (Rectangle box: hitboxes){
-			if (tempInt == 0){
-				font.setColor(Color.RED);
-			} else if (tempInt == 1){
-				font.setColor(Color.BLUE);
-			} else if (tempInt == 2){
-				font.setColor(Color.GREEN);
-			} else if (tempInt == 3){
-				font.setColor(Color.PURPLE);
-			}else if (tempInt == 4){
-				font.setColor(Color.PINK);
-			} else if (tempInt == 5){
-				font.setColor(Color.ORANGE);
-			} else if (tempInt == 6){
-				font.setColor(Color.YELLOW);
-			} else if (tempInt == 7){
-				font.setColor(Color.BLACK);
-			}
-			tempInt += 1;
-			font.draw(batch, "x", box.getX(), screenHeight - (box.getY()));
-			font.draw(batch, "x", box.getX() + box.getWidth(), screenHeight - (box.getY()));
-			font.draw(batch, "x", box.getX(), screenHeight - (box.getY() + box.getHeight()));
-			font.draw(batch, "x", box.getX() + box.getWidth(), screenHeight - (box.getY() + box.getHeight()));
-
-			batch.draw(chefImage, box.getX(), screenHeight - box.getY());
-			batch.draw(chefImage, box.getX() + box.getWidth(), screenHeight - (box.getY()));
-			batch.draw(chefImage, box.getX(), screenHeight - (box.getY() + box.getHeight()));
-			batch.draw(chefImage, box.getX() + box.getWidth(), screenHeight - (box.getY() + box.getHeight()));
-		}
-         */
 
 		batch.end();
 	}
@@ -520,18 +454,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 * @param y Y position of the area that has been clicked.
 	 */
 	public void clickEvent (int x, int y){
-		/*if (lastClickObject) {
-			onClickMove(x, y);
-		} else {
-			onClickObject(x, y);
-		}
-		for (int i=0; i<8; i++) {
-			if (loadRectangle(Integer.toString(i), 1).contains(x, Gdx.graphics.getHeight() - y)){
-				System.out.println(i);
-			}
-		}
-		 */
-
 		if (rectangleDetection(grill, x, Gdx.graphics.getHeight() - y) &&
                 ((rectangleDetection(grill, chefOne.getX(), chefOne.getY())) ||
                 (rectangleDetection(grill, chefTwo.getX(), chefTwo.getY())))){
@@ -568,12 +490,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		}
 	}
 
-	/*	private void onClickMove(int x, int y){
-		lastClick.x = x;
-		lastClick.y = Gdx.graphics.getHeight() - y;
-		lastClickObject = false;
-	}*/
-
 	/**
 	 * Checks whether the users click is on any of the sprites.
 	 *
@@ -609,13 +525,13 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	@Override
 	public boolean keyDown(int keycode) {
 		if (keycode == Input.Keys.H){
+            // Info screen contains all orders and ingredients.
 			game.setScreen(new InfoScreen(game, this));
 		} else if (keycode == Input.Keys.I){
+            // Instruction screen describing game.
 			game.setScreen(new InfoScreen(game, this));
 		}
 		if (lastClickObject == true) {
-			/*return false;
-		} else {*/
 			chefMove = true;
 			keyCode = keycode;
 		}
@@ -636,38 +552,28 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		return false;
 	}
 
+    /**
+     *
+     * @param x X coordinate that the chef would move to if move takes place.
+     * @param y Y coordinate that the chef would move to if move takes place.
+     * @return Boolean : Can move take place.
+     */
     public Boolean collisionDetection(float x, float y){
-        //Layers 0 and 11 as in tiled map.
-        /*for (int i=0; i<1; i++) {
-			Rectangle temp = loadRectangle(Integer.toString(i), 1);
-            if (loadRectangle(Integer.toString(i), 1).contains(sprite.getX(), sprite.getY())){
-				System.out.println("collision");
-                return false;
-            }
-        }*/
-
 		if (y > screenHeight * 0.75){
-			System.out.println("collision");
 			return false;
 		}
 		if (y < screenHeight * 0.25){
-			System.out.println("collision 2");
 			return false;
 		}
 		if (y < screenHeight * 0.4 && x > screenWidth * 0.5){
-			System.out.println("collision 3");
 			return false;
 		}
 		if (x < (screenWidth * 0.015)){
-			System.out.println("collision 4");
 			return false;
 		}
 		if (x > (screenWidth * 0.925)){
-			System.out.println("collision 5");
 			return false;
 		}
-
-		//System.out.println("none");
         return true;
 
     }
@@ -680,15 +586,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	private void characterMovement(int keycode) {
 		int pixelPerFrame = Math.round((Gdx.graphics.getWidth() / 3) * Gdx.graphics.getDeltaTime());
-		/*if (keycode == 51 && collisionDetection(new Rectangle(lastClick.x, lastClick.y + pixelPerFrame, lastClick.width, lastClick.height))) {
-			lastClick.y += pixelPerFrame;
-		} else if (keycode == 29 && collisionDetection(new Rectangle(lastClick.x - pixelPerFrame, lastClick.y, lastClick.width, lastClick.height))) {
-			lastClick.x -= pixelPerFrame;
-		} else if (keycode == 47 && collisionDetection(new Rectangle(lastClick.x, lastClick.y - pixelPerFrame, lastClick.width, lastClick.height))) {
-			lastClick.y -= pixelPerFrame;
-		} else if (keycode == 32 && collisionDetection(new Rectangle(lastClick.x + pixelPerFrame, lastClick.y, lastClick.width, lastClick.height))) {
-			lastClick.x += pixelPerFrame;
-		}*/
         if (keycode == 51 && collisionDetection(lastClick.getX(), lastClick.getY() + pixelPerFrame)) {
 			lastClick.y += pixelPerFrame;
         } else if (keycode == 29 && collisionDetection(lastClick.getX() - pixelPerFrame, lastClick.getY())) {
@@ -699,29 +596,13 @@ public class Map extends ScreenAdapter implements InputProcessor{
             lastClick.x += pixelPerFrame;
         }
 		detectCollision();
-
 	}
 
 	/**
 	 * Detects any collisions between selected chef and work stations
 	 */
 	private void detectCollision(){
-		/* if (lastClick.overlaps(ingredientsStation)){
-			if (pantryInventory == null){
-				game.setScreen(new PantrySelection(game, new ArrayList<Ingredient>(), orders));
-			}
-			else{
-				game.setScreen(new PantrySelection(game, pantryInventory, orders));
-			}
-			dispose();
-		}
-		if (lastClick.overlaps(grill)){
-			System.out.println("DETECTED");
-			game.setScreen(new Grill(game, inventory));
-			dispose();
-		}
-		 */
-		// TODO: A neater way of object detection.
+        // TODO: Add any new hitboxes with a corresponding function.
 		if (rectangleDetection(ingredientsForSalad, lastClick.getX(), lastClick.getY())){
 			addSaladIngredients();
 		}
@@ -739,21 +620,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			chooseGrillItems();
 		}
 	}
-
-	/**
-	 * Checks if last interaction with station was at least 15 seconds ago
-	 *
-	 * @param timePara time of last interaction with station
-	 * @return truth value of time check
-	 */
-    public Boolean timerStations(Long timePara){
-       if (timePara == 0 || System.currentTimeMillis() - timePara > 15000){
-           return true;
-        }
-        else{
-            return false;
-        }
-    }
 
 	/**
 	 * Checks order list and adds needed chiller ingredients to inventory
@@ -782,8 +648,6 @@ public class Map extends ScreenAdapter implements InputProcessor{
                     counter.set(1, counter.get(1) + 1);
 					pantryInventory.add(tempObject);
 					break;
-                default:
-                    //tempObject = moveToNextObject(tempObject, false);
             }
         }
         if (changeMessage(counter)) {
@@ -793,6 +657,11 @@ public class Map extends ScreenAdapter implements InputProcessor{
         }
 	}
 
+    /**
+     *
+     * @param counter Contains the number of each unique ingredient/recipe operated on.
+     * @return True if something has been done, false otherwie.
+     */
     public Boolean changeMessage(ArrayList<Integer> counter){
         for (int count: counter){
             if (count != 0){
@@ -802,48 +671,10 @@ public class Map extends ScreenAdapter implements InputProcessor{
         return false;
     }
 
-
-    /*public Ingredient moveToNextObject(Ingredient iteratorItem, Boolean delete){
-        if (delete){
-            pantryInventory.add(iteratorItem);
-            if (iterator.hasNext()) {
-                iteratorItem = iterator.next();
-            }
-            iterator.remove();
-            return iteratorItem;
-        }
-        else{
-            if (iterator.hasNext()) {
-                iteratorItem = iterator.next();
-                return iteratorItem;
-            }
-            return null;
-        }
-    }*/
-
 	/**
 	 * Checks order list and adds needed salad station ingredients to inventory
 	 */
 	public void addSaladIngredients(){
-        /*
-		Set<Ingredient> setCopy = new HashSet<>(shoppingList);
-		for (Ingredient newItem: shoppingList){
-			//TODO: Remove once added!
-			switch (newItem.getName()){
-				case "SaladDressing":
-					pantryInventory.add(newItem);
-					setCopy.remove(newItem);
-				case "Chicken":
-					pantryInventory.add(newItem);
-					setCopy.remove(newItem);
-				case "Lettuce":
-					pantryInventory.add(newItem);
-					setCopy.remove(newItem);
-				case "Peppers":
-					pantryInventory.add(newItem);
-					setCopy.remove(newItem);
-			}
-			*/
         if (shoppingList.isEmpty()){
             return;
         }
@@ -895,10 +726,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 * Chops any ingredients that can be chopped
 	 */
 	public void chopIngredients(){
-		// TODO: Timing mechanism + staff.
         choppingStaff = true;
-		// TODO: Digital Message!
-		System.out.println("INGREDIENTS CHOPPED!");
 	}
 
 	/**
@@ -923,6 +751,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
                 }
 				iterator.remove();
 				finishedOrders --;
+                orderAnimation = true;
 			}
 		}
 

@@ -6,12 +6,16 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.video.VideoPlayer;
 import com.badlogic.gdx.video.VideoPlayerCreator;
+import org.lwjgl.Sys;
 
 import java.io.FileNotFoundException;
 
@@ -21,6 +25,7 @@ public class MainMenu extends ScreenAdapter implements InputProcessor {
     SpriteBatch batch;
     BitmapFont font;
     final String INPUT = String.format("Piazza Panic %n Press S to Start Game");
+
 
     public MainMenu(PiazzaPanicGame game){
         this.game = game;
@@ -110,4 +115,5 @@ public class MainMenu extends ScreenAdapter implements InputProcessor {
     public boolean scrolled(float amountX, float amountY) {
         return false;
     }
+
 }
