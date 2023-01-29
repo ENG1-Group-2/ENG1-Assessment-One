@@ -26,6 +26,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.lwjgl.Sys;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -77,6 +78,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	// The last key pressed.
 	int keyCode;
 	int mapWidth, mapHeight, tileSize;
+    boolean assemblyLock = false;
 
 	final PiazzaPanicGame game;
     Music menuMusic;
@@ -533,7 +535,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		if (rectangleDetection(grill, x, Gdx.graphics.getHeight() - y) &&
                 ((rectangleDetection(grill, chefOne.getX(), chefOne.getY())) ||
                 (rectangleDetection(grill, chefTwo.getX(), chefTwo.getY())))){
-			burgerGrill.flipItems();
+			message = burgerGrill.flipItems();
 		}
 		if (rectangleDetection(choppingStation, x, Gdx.graphics.getHeight() - y) &&
 				((rectangleDetection(choppingStation, chefOne.getX(), chefOne.getY())) ||
@@ -727,11 +729,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
 				chopIngredients();
 				choppingStationTime = System.currentTimeMillis();
 		}
-		if (rectangleDetection(assemblyStation, lastClick.getX(), lastClick.getY()) && assemblyStationLock == false) {
+		if (rectangleDetection(assemblyStation, lastClick.getX(), lastClick.getY())) {
 			assembly();
-			assemblyStationLock = true;
-		} else {
-			assemblyStationLock = false;
 		}
 		if (rectangleDetection(chiller, lastClick.getX(), lastClick.getY())) {
 			getChillerItems();
@@ -787,10 +786,22 @@ public class Map extends ScreenAdapter implements InputProcessor{
                     //tempObject = moveToNextObject(tempObject, false);
             }
         }
-        message = String.format("Burger Patty %d %n Burger Bun %d %n",
-                counter.get(0), counter.get(1));
-        lastMessage = System.currentTimeMillis();
+        if (changeMessage(counter)) {
+            message = String.format("Burger Patty %d %n Burger Bun %d %n",
+                    counter.get(0), counter.get(1));
+            lastMessage = System.currentTimeMillis();
+        }
 	}
+
+    public Boolean changeMessage(ArrayList<Integer> counter){
+        for (int count: counter){
+            if (count != 0){
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /*public Ingredient moveToNextObject(Ingredient iteratorItem, Boolean delete){
         if (delete){
@@ -873,10 +884,11 @@ public class Map extends ScreenAdapter implements InputProcessor{
                     //tempObject = moveToNextObject(tempObject, false);
             }
         }
-		//TODO: Display on screen.
-		message = String.format("Salad Dressing %d %n Chicken %d %n Lettuce %d %n Peppers %d %n",
-                counter.get(0), counter.get(1), counter.get(2), counter.get(3));
-        lastMessage = System.currentTimeMillis();
+		if (changeMessage(counter)) {
+            message = String.format("Salad Dressing %d %n Chicken %d %n Lettuce %d %n Peppers %d %n",
+                    counter.get(0), counter.get(1), counter.get(2), counter.get(3));
+            lastMessage = System.currentTimeMillis();
+        }
 	}
 
 	/**
@@ -904,22 +916,20 @@ public class Map extends ScreenAdapter implements InputProcessor{
 				removeIngredients(tempObject);
                 Sound assemblySound = Gdx.audio.newSound(Gdx.files.internal("assembly station sound.wav"));
                 assemblySound.play();
-				for (int i = 0; i<recipes.size(); i++){
-                if (tempObject.getName() == recipes.get(i).getName()){
-					counter.set(i, counter.get(i) + 1);
-					}
-				}
+                if (tempObject.getName() == "Beef Burger"){
+                    counter.set(0, counter.get(0) + 1);
+                } else {
+                    counter.set(1, counter.get(1) + 1);
+                }
 				iterator.remove();
 				finishedOrders --;
 			}
 		}
-		message = "Assembled";
-		for (int i = 0; i<recipes.size(); i++) {
-			if (counter.get(i) >= 0) {
-				message += String.format("%n %s %d", recipes.get(i).getName(), counter.get(i));
-				lastMessage = System.currentTimeMillis();
-			}
-		}
+
+        if (changeMessage(counter)){
+            lastMessage = System.currentTimeMillis();
+            message = String.format("Assembled %n Beef Burger %d %n Chicken Salad %d", counter.get(0), counter.get(1));
+        }
 
 		if (finishedOrders == 0){
 			Long finishTime = ((System.currentTimeMillis() - startTime) / 1000) % 60;

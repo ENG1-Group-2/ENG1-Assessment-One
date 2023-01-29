@@ -69,13 +69,15 @@ public class Grill{
         }
     }
 
-    public void flipItems() {
+    public String flipItems() {
+        String message = "";
         for (int i = 0; hobs.size() > i; i++) {
             if (hobs.get(i).getName() != null && hobs.get(i).getFlipped() == false) {
                 hobs.get(i).flip();
-
+                message = "Flipped";
             }
         }
+        return message;
     }
 
     public ArrayList<Ingredient> getItems(){
