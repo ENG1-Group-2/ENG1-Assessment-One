@@ -8,6 +8,7 @@ public class Ingredient {
     public Boolean chopped;
     public Boolean cooked;
     public Boolean flipped;
+    long cookingStart = 0;
 
     /**
      * Creates new instance of an ingredient
@@ -92,6 +93,11 @@ public class Ingredient {
     public boolean getCooked(){
         return cooked;
     }
+
+    /**
+     * Sets the cooking start time of ingredient back to 0
+     */
+    public void resetCookingStart(){this.cookingStart = 0;}
 
     /**
      * Ends cooking process

@@ -4,13 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -103,7 +102,7 @@ public class InfoScreen extends ScreenAdapter implements InputProcessor {
         String orderList;
         orderList = "Orders:";
         for (int i=0; i < orders.size(); i++){
-            orderNo.replace(orders.get(i).getName(), orderNo.get(orders.get(i).getName())+1);
+            orderNo.put(orders.get(i).getName(), orderNo.get(orders.get(i).getName())+1);
         }
 
         String ingredientList1 = "Ingredients:\n";

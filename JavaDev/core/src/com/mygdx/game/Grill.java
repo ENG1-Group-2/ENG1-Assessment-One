@@ -52,21 +52,22 @@ public class Grill{
     /**
      * Looks through each ingredient on the hob and checks
      * whether it has been there for enough time.
-     * @return Ingredient If a cook hasn't finished, it returns
-     * the corrosponding item.
+     * @return Ingredient If any items have been burnt it returns true;
      */
-    public Ingredient hasGrillEnded(){
+    public ArrayList<Ingredient> hasGrillEnded(){
+        ArrayList<Ingredient> burntItem = new ArrayList<>();
         for (int i = 0; hobs.size() > i; i++) {
             if (hobs.get(i).getName() != null &&
                     System.currentTimeMillis() - hobs.get(i).getCookingStartTime() >= hobs.get(i).getCookingTime() * 1000){
                 if (hobs.get(i).endCook() == false){
-                    return hobs.get(i);
+                    hobs.get(i).resetCookingStart();
+                    burntItem.add(hobs.get(i));
                 }
                 hobs.set(i, new Ingredient(null, false, false, false));
                 grillSound.pause();
             }
         }
-        return null;
+        return burntItem;
     }
 
     /**

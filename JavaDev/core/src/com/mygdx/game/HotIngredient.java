@@ -33,6 +33,11 @@ public class HotIngredient extends Ingredient {
     }
 
     /**
+     * Sets the cooking start time of ingredient back to 0
+     */
+    public void resetCookingStart(){this.cookingStart = 0;}
+
+    /**
      * Gets time taken to cook
      *
      * @return cooking time

@@ -5,7 +5,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapProperties;
@@ -24,6 +26,8 @@ public class InstructionScreen extends ScreenAdapter implements InputProcessor {
     TiledMap tiledMenu;
     OrthographicCamera camera;
     TiledMapRenderer tiledMenuRenderer;
+    SpriteBatch batch;
+    Texture instructionsImage;
 
     /**
      * Constructor method.
@@ -57,6 +61,23 @@ public class InstructionScreen extends ScreenAdapter implements InputProcessor {
         tiledMenuRenderer = new OrthogonalTiledMapRenderer(tiledMenu);
 
         Gdx.input.setInputProcessor(this);
+        instructionsImage = new Texture(Gdx.files.internal("Instruction.png"));
+        batch = new SpriteBatch();
+
+    }
+
+    @Override
+    public void render(float delta) {
+        // Set black background anc clear screen
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        camera.update();
+        tiledMenuRenderer.setView(camera);
+        tiledMenuRenderer.render();
+        batch.begin();
+        batch.draw(instructionsImage, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.end();
     }
 
     /**

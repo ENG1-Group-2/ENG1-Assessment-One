@@ -23,20 +23,15 @@ import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import org.lwjgl.Sys;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Main game screen which enables the user to control the map.
  * Inputs are detected by implementing InputProcessor which explains empty functions.
  * Auto launches this screen in the current prototype.
  */
+@SuppressWarnings("IntegerDivisionInFloatingPointContext")
 public class Map extends ScreenAdapter implements InputProcessor{
 	// Stores any items that have been collected.
 	ArrayList<Ingredient> pantryInventory;
@@ -89,7 +84,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
     Rectangle hob1, hob2;
     Texture burgerCookImagePost, burgerCookImagePre;
 	Texture knifeImage;
-    Long startTime = 0L;
+    Long startTime;
     BitmapFont font;
     String message;
     Long lastMessage;
@@ -240,7 +235,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 * @param object Rectangle object in need of scaling
 	 * @param mapWidth number of pixels wide the Tiled map is
 	 * @param mapHeight number of pixels tall the Tiled map is
-	 * @return
+	 * @return input object with scaled (X, Y) coordinates and dimensions
 	 */
 	public Rectangle scaleObject(Rectangle object, int mapWidth, int mapHeight) {
 		object.setX(Math.round((object.getX() / mapWidth) * screenWidth));
@@ -302,6 +297,11 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	@Override
 	public void render(float delta) {
+		// If the end game message has been there for more than 5 seconds.
+		if (message.startsWith("Game Complete in ") && System.currentTimeMillis() - lastMessage > 5000) {
+			Gdx.app.exit();
+		}
+
      	// Set black background and clear screen
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -330,7 +330,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
         cooked. Changes from pink to brown.
          */
         ArrayList<Ingredient> hobs = burgerGrill.getItems();
-        if (hobs.get(0).getName() == "BurgerPatty") {
+        if (Objects.equals(hobs.get(0).getName(), "BurgerPatty")) {
             Ingredient item = hobs.get(0);
             if (System.currentTimeMillis() - item.getCookingStartTime() > 2000 && item.getCookingStartTime() != 0) {
                 batch.draw(burgerCookImagePost, hob1.x, hob1.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
@@ -339,7 +339,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
             }
         }
 
-        if (hobs.get(1).getName() == "BurgerPatty") {
+        if (Objects.equals(hobs.get(1).getName(), "BurgerPatty")) {
             Ingredient item = hobs.get(1);
             if (System.currentTimeMillis() - item.getCookingStartTime() > 2000 && item.getCookingStartTime() != 0) {
                 batch.draw(burgerCookImagePost, hob2.x, hob2.y, Math.round(screenWidth / 20), Math.round(screenHeight / 20));
@@ -350,7 +350,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
         // If any ingredients need chopping display the knife.
 		for (Ingredient ingredient: pantryInventory){
-			if (ingredient.getChopped() == false){
+			if (!ingredient.getChopped()){
 				batch.draw(knifeImage, Math.round(screenWidth * 0.43), Math.round(screenHeight * 0.83), Math.round(screenWidth / 20), Math.round(screenHeight / 20));
 				break;
 			}
@@ -419,10 +419,12 @@ public class Map extends ScreenAdapter implements InputProcessor{
 
         if (rectangleDetection(grill, chefOne.getX(), chefOne.getY()) ||
                 rectangleDetection(grill, chefTwo.getX(), chefTwo.getY())) {
-            Ingredient temp = burgerGrill.hasGrillEnded();
+            ArrayList<Ingredient> temp = burgerGrill.hasGrillEnded();
             // Indicates that the cook has failed so he will need to be able to collect it again.
-            if (temp != null){
-                shoppingList.add(temp);
+            if (temp.size() != 0){
+                shoppingList.addAll(temp);
+				pantryInventory.removeAll(temp);
+				message = "Item burnt";
             }
 		}
 
@@ -463,7 +465,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 				((rectangleDetection(choppingStation, chefOne.getX(), chefOne.getY())) ||
 						(rectangleDetection(choppingStation, chefTwo.getX(), chefTwo.getY())))){
 			for (Ingredient ingredient: pantryInventory){
-				if (ingredient.getChopped() == false){
+				if (!ingredient.getChopped()){
 					ingredient.chopIngredient();
 					message = String.format("%s Chopped!", ingredient.getName());
 					break;
@@ -533,7 +535,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		} else if (keycode == Input.Keys.BACKSPACE){
 			Gdx.app.exit();
 		}
-		if (lastClickObject == true) {
+		if (lastClickObject) {
 			chefMove = true;
 			keyCode = keycode;
 		}
@@ -746,7 +748,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 				removeIngredients(tempObject);
                 Sound assemblySound = Gdx.audio.newSound(Gdx.files.internal("assembly station sound.wav"));
                 assemblySound.play();
-                if (tempObject.getName() == "Beef Burger"){
+                if (Objects.equals(tempObject.getName(), "Beef Burger")){
                     counter.set(0, counter.get(0) + 1);
                 } else {
                     counter.set(1, counter.get(1) + 1);
@@ -762,13 +764,14 @@ public class Map extends ScreenAdapter implements InputProcessor{
             message = String.format("Assembled %n Beef Burger %d %n Chicken Salad %d", counter.get(0), counter.get(1));
         }
 
-		if (finishedOrders == 0){
-			Long finishTime = ((System.currentTimeMillis() - startTime) / 1000) % 60;
+		if (finishedOrders == 0 && !message.startsWith("Game Complete in ")){
+			long finishTime = ((System.currentTimeMillis() - startTime) / 1000);
 			lastMessage = System.currentTimeMillis();
-			message = String.format("Game Complete in %d seconds", finishTime);
+			message = String.format("Game Complete in %d minutes %d seconds", finishTime / 60, finishTime % 60);
+			}
 		}
 
-	}
+
 
 	/**
 	 * Removes all used ingredients from inventory
@@ -807,7 +810,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 	 */
 	public void chooseGrillItems(){
 		for (Ingredient rawItem: pantryInventory) {
-			if (rawItem instanceof HotIngredient && ((HotIngredient) rawItem).hasCookStarted() == false){
+			if (rawItem instanceof HotIngredient && !((HotIngredient) rawItem).hasCookStarted()){
 				switch (rawItem.getName()) {
 					case "Bun":
                         burgerGrill.grillItem(rawItem);
