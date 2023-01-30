@@ -1,5 +1,8 @@
 package com.mygdx.game;
 
+/**
+ * Base ingredient class where items can not be cooked.
+ */
 public class Ingredient {
     public String name;
     public Boolean chopped;
@@ -54,6 +57,9 @@ public class Ingredient {
         }
     }
 
+    /**
+     * Flips item if it has not already been flipped.
+     */
     public void flip(){
         if (flipped == false){
             flipped = true;

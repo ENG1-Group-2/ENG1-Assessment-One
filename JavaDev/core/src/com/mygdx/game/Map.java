@@ -149,8 +149,8 @@ public class Map extends ScreenAdapter implements InputProcessor{
         parameter.color = Color.BLUE;
         font = generator.generateFont(parameter);
 
-        hob1 = new Rectangle(390, 400, 5,5 );
-		hob2 = new Rectangle(410, 400, 5,5 );
+        hob1 = new Rectangle((float) (screenWidth * 0.65), (float) (screenHeight * 0.85), 5,5 );
+		hob2 = new Rectangle((float) (screenWidth * 0.6), (float) (screenHeight * 0.85), 5,5 );
 
         // Plays music if it is not playing yet.
 		if (menuMusic == null || !menuMusic.isPlaying()) {
@@ -415,7 +415,7 @@ public class Map extends ScreenAdapter implements InputProcessor{
 		}
 
         String grillInfo = burgerGrill.displayGrillInfo();
-		font.draw(batch, grillInfo, 20, 20);
+		font.draw(batch, grillInfo, (float) (screenWidth * 0.1), (float) (screenHeight * 0.1));
 
         if (rectangleDetection(grill, chefOne.getX(), chefOne.getY()) ||
                 rectangleDetection(grill, chefTwo.getX(), chefTwo.getY())) {

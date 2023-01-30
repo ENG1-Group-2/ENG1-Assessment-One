@@ -14,20 +14,30 @@ import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
+/**
+ * Loads a jpeg which acts as the instruction - not an
+ * interactable screen.
+ */
 public class InstructionScreen extends ScreenAdapter implements InputProcessor {
     final PiazzaPanicGame game;
     Map gameState;
-    Music menuMusic;
-    BitmapFont font = new BitmapFont();
-    SpriteBatch batch = new SpriteBatch();
     TiledMap tiledMenu;
     OrthographicCamera camera;
     TiledMapRenderer tiledMenuRenderer;
 
+    /**
+     * Constructor method.
+     * @param game The instance of the PiazzaPanicGame.
+     * @param gameState A map class that the user has just come from.
+     */
     public InstructionScreen(final PiazzaPanicGame game, Map gameState) {
         this.game = game;
         this.gameState = gameState;
     }
+
+    /**
+     * Runs on creation of the class.
+     */
     public void show(){
         tiledMenu = new TmxMapLoader().load("Tiled/infoScreen.tmx");
 
@@ -49,11 +59,19 @@ public class InstructionScreen extends ScreenAdapter implements InputProcessor {
         Gdx.input.setInputProcessor(this);
     }
 
+    /**
+     * Unused method
+     */
     @Override
     public boolean keyDown(int keycode) {
         return false;
     }
 
+    /**
+     * If escape, return back to the game. If backspace, close game.
+     * @param keycode one of the constants in {@link Input.Keys}
+     * @return false
+     */
     @Override
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.ESCAPE){
@@ -63,30 +81,50 @@ public class InstructionScreen extends ScreenAdapter implements InputProcessor {
         }
         return false;
     }
+
+    /**
+     * Unused method
+     */
     @Override
     public boolean keyTyped(char character) {
         return false;
     }
+
+    /**
+     * Unused method
+     */
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         return false;
     }
 
+    /**
+     * Unused method
+     */
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         return false;
     }
 
+    /**
+     * Unused method
+     */
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         return false;
     }
 
+    /**
+     * Unused method
+     */
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
         return false;
     }
 
+    /**
+     * Unused method
+     */
     @Override
     public boolean scrolled(float amountX, float amountY) {
         return false;

@@ -1,7 +1,9 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.Gdx;
-
+/**
+ * Inherits ingredient class but allow for cooking
+ * operations as well.
+ */
 public class HotIngredient extends Ingredient {
     public long cookingTime;
     long cookingStart;
