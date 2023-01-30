@@ -1,23 +1,20 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.video.VideoPlayer;
 import com.badlogic.gdx.video.VideoPlayerCreator;
-import org.lwjgl.Sys;
 
-import java.awt.*;
 import java.io.FileNotFoundException;
 
+/**
+ * Plays video on Launch.
+ */
 public class MainMenu extends ScreenAdapter implements InputProcessor {
     VideoPlayer videoPlayer;
     final PiazzaPanicGame game;
@@ -25,17 +22,19 @@ public class MainMenu extends ScreenAdapter implements InputProcessor {
     BitmapFont font;
     final String INPUT = String.format("Piazza Panic %n Press S to Start Game %n Press Backspace to exit game");
 
-
+    /**
+     * Constructor method.
+     * @param game Instance of Game.
+     */
     public MainMenu(PiazzaPanicGame game){
         this.game = game;
-        /*Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        double width = screenSize.getWidth();
-        double height = screenSize.getHeight();
-        Gdx.graphics.setWindowedMode((int)width, (int)height);*/
         Graphics.DisplayMode dm = Gdx.graphics.getDisplayMode();
         Gdx.graphics.setWindowedMode(dm.width, dm.height);
     }
 
+    /**
+     * Runs on creation of the class.
+     */
     @Override
     public void show(){
         videoPlayer = VideoPlayerCreator.createVideoPlayer();
@@ -64,6 +63,12 @@ public class MainMenu extends ScreenAdapter implements InputProcessor {
         Gdx.input.setInputProcessor(this);
 
     }
+
+    /**
+     * Finds the appropriate location on screen and draw the
+     * text on.
+     * @param delta The time in seconds since the last render.
+     */
     @Override
     public void render(float delta){
         videoPlayer.update();
@@ -78,6 +83,11 @@ public class MainMenu extends ScreenAdapter implements InputProcessor {
         batch.end();
     }
 
+    /**
+     * If S, start game. If backspaced, quit game.
+     * @param keycode one of the constants in {@link Input.Keys}
+     * @return false
+     */
     @Override
     public boolean keyDown(int keycode) {
         if (keycode == Input.Keys.S){
@@ -88,21 +98,33 @@ public class MainMenu extends ScreenAdapter implements InputProcessor {
         return false;
     }
 
+    /**
+     * Unused method
+     */
     @Override
     public boolean keyUp(int keycode) {
         return false;
     }
 
+    /**
+     * Unused method
+     */
     @Override
     public boolean keyTyped(char character) {
         return false;
     }
 
+    /**
+     * Unused method
+     */
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         return false;
     }
 
+    /**
+     * Unused method
+     */
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         return false;
@@ -113,11 +135,17 @@ public class MainMenu extends ScreenAdapter implements InputProcessor {
         return false;
     }
 
+    /**
+     * Unused method
+     */
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
         return false;
     }
 
+    /**
+     * Unused method
+     */
     @Override
     public boolean scrolled(float amountX, float amountY) {
         return false;

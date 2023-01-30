@@ -6,11 +6,19 @@ import com.badlogic.gdx.math.Rectangle;
 
 import java.util.ArrayList;
 
+/**
+ * Designed for any station that can be used to grill items.
+ */
 public class Grill{
     Rectangle grill;
     ArrayList<Ingredient> hobs;
     Sound grillSound = Gdx.audio.newSound(Gdx.files.internal("grill_sound.wav"));
 
+    /**
+     * Constructor method.
+     * @param grill location of grill on the map.
+     * @param hobs number of hobs within the map.
+     */
     public Grill(Rectangle grill, int hobs){
         this.grill = grill;
         this.hobs = new ArrayList<>(hobs);
@@ -23,6 +31,10 @@ public class Grill{
         grillSound.pause();
     }
 
+    /**
+     * Display timer for anything on the grill.
+     * @return How long each item has been on the grill.
+     */
     public String displayGrillInfo() {
         String temp = "";
         int counter = 0;
@@ -34,10 +46,15 @@ public class Grill{
                 temp += "Grill" + counter + "Timer:" + timeDifference;
             }
         }
-        //System.out.println(temp);
         return temp;
     }
 
+    /**
+     * Looks through each ingredient on the hob and checks
+     * whether it has been there for enough time.
+     * @return Ingredient If a cook hasn't finished, it returns
+     * the corrosponding item.
+     */
     public Ingredient hasGrillEnded(){
         for (int i = 0; hobs.size() > i; i++) {
             if (hobs.get(i).getName() != null &&
@@ -68,6 +85,11 @@ public class Grill{
         }
     }
 
+    /**
+     * Flips any items that haven't already been flipped on the hob.
+     *
+     * @return String A message displaying what has happened.
+     */
     public String flipItems() {
         String message = "";
         for (int i = 0; hobs.size() > i; i++) {
@@ -79,6 +101,10 @@ public class Grill{
         return message;
     }
 
+    /**
+     * Getter method.
+     * @return class variable hobs.
+     */
     public ArrayList<Ingredient> getItems(){
         return hobs;
     }

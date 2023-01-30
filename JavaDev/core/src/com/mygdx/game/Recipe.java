@@ -2,6 +2,9 @@ package com.mygdx.game;
 
 import java.util.ArrayList;
 
+/**
+ * Data structure to hold all recipes.
+ */
 public class Recipe {
     ArrayList<Ingredient> ingredients;
     String name;
