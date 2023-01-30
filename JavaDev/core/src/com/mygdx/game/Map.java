@@ -529,7 +529,9 @@ public class Map extends ScreenAdapter implements InputProcessor{
 			game.setScreen(new InfoScreen(game, this));
 		} else if (keycode == Input.Keys.I){
             // Instruction screen describing game.
-			game.setScreen(new InfoScreen(game, this));
+			game.setScreen(new InstructionScreen(game, this));
+		} else if (keycode == Input.Keys.BACKSPACE){
+			Gdx.app.exit();
 		}
 		if (lastClickObject == true) {
 			chefMove = true;

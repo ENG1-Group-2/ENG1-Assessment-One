@@ -63,7 +63,6 @@ public class Grill{
                 hobs.set(i, toCook);
                 toCook.startToCook();
                 grillSound.play();
-                grillSound.pause();
                 return;
             }
         }

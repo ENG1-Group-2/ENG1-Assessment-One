@@ -58,6 +58,8 @@ public class InstructionScreen extends ScreenAdapter implements InputProcessor {
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.ESCAPE){
             game.setScreen(gameState);
+        } else if (keycode == Input.Keys.BACKSPACE){
+            Gdx.app.exit();
         }
         return false;
     }

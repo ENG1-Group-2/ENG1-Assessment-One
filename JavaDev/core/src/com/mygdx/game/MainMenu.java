@@ -1,9 +1,7 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.*;
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -17,6 +15,7 @@ import com.badlogic.gdx.video.VideoPlayer;
 import com.badlogic.gdx.video.VideoPlayerCreator;
 import org.lwjgl.Sys;
 
+import java.awt.*;
 import java.io.FileNotFoundException;
 
 public class MainMenu extends ScreenAdapter implements InputProcessor {
@@ -24,11 +23,17 @@ public class MainMenu extends ScreenAdapter implements InputProcessor {
     final PiazzaPanicGame game;
     SpriteBatch batch;
     BitmapFont font;
-    final String INPUT = String.format("Piazza Panic %n Press S to Start Game");
+    final String INPUT = String.format("Piazza Panic %n Press S to Start Game %n Press Backspace to exit game");
 
 
     public MainMenu(PiazzaPanicGame game){
         this.game = game;
+        /*Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        double width = screenSize.getWidth();
+        double height = screenSize.getHeight();
+        Gdx.graphics.setWindowedMode((int)width, (int)height);*/
+        Graphics.DisplayMode dm = Gdx.graphics.getDisplayMode();
+        Gdx.graphics.setWindowedMode(dm.width, dm.height);
     }
 
     @Override
@@ -77,6 +82,8 @@ public class MainMenu extends ScreenAdapter implements InputProcessor {
     public boolean keyDown(int keycode) {
         if (keycode == Input.Keys.S){
             game.setScreen(new Map(game));
+        } else if (keycode == Input.Keys.BACKSPACE){
+            Gdx.app.exit();
         }
         return false;
     }
