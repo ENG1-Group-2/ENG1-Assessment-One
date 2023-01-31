@@ -1,11 +1,3 @@
-
-(no subject)
-Vivek Mistry <vm800@york.ac.uk>
-	
-12:30 (0 minutes ago)
-	
-	
-to Vivek
 ## University of York ENG1 Module - 2022/23 (Piazza Panic)
 
 # Contributors:
@@ -50,7 +42,3 @@ https://www.mapeditor.org/download.html
 * I for instructions.
 * H to see pantry.
 
-
--- 
-v mistry
-	
