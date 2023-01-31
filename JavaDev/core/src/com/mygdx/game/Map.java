@@ -31,7 +31,6 @@ import java.util.*;
  * Inputs are detected by implementing InputProcessor which explains empty functions.
  * Auto launches this screen in the current prototype.
  */
-@SuppressWarnings("IntegerDivisionInFloatingPointContext")
 public class Map extends ScreenAdapter implements InputProcessor{
 	// Stores any items that have been collected.
 	ArrayList<Ingredient> pantryInventory;
