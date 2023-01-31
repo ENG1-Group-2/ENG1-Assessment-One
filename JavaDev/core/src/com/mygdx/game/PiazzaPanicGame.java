@@ -1,39 +1,20 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.maps.MapProperties;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.Input.Keys;
-
-import java.util.ArrayList;
 
 /**
- * Main game screen which enables the user to control the map.
- * Inputs are detected by implementing InputProcessor which explains empty functions.
- * Auto launches this screen in the current prototype.
+ * Base class for all operating systems.
  */
-public class PiazzaPanicGame extends ApplicationAdapter implements InputProcessor{
-	TiledMap tiledMap;
-	OrthographicCamera camera;
-	TiledMapRenderer tiledMapRenderer;
-	Rectangle chefOne;
-	Rectangle chefTwo;
-	Texture chefImage;
-	SpriteBatch batch;
-	//Keep track on what object was clicked last to help with movement.
-	Rectangle lastClick;
-	//Keep track of whether a relevant object was clicked previously.
-	Boolean lastClickObject;
-	ArrayList<Rectangle> sprites = new ArrayList<>();
+public class PiazzaPanicGame extends Game{
+    /**
+     * Runs MainMenu Screen on startup.
+     */
+    @Override
+    public void create () {
+        setScreen(new MainMenu(this));
+    }
 
 	/**
 	 * Loads the map and sprites.
